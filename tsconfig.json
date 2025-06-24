@@ -1,6 +1,5 @@
 {
 	"compilerOptions": {
-        "outDir": "dist",
 		"target": "ESNext",
 		"module": "ESNext",
 		"lib": ["ESNext", "DOM"],
@@ -16,6 +15,8 @@
 		"paths": {
 			"@/*": ["src/*"]
 		},
+        "outDir": "dist/types",
+        "types": ["unplugin-vue-define-options"],
 		"declaration": true,
 		"allowJs": true
 	},
