@@ -1,0 +1,46 @@
+{
+    "name": "@creatorsn/powereditor3",
+    "private": false,
+    "version": "0.0.4",
+    "publishConfig": {
+        "access": "public"
+    },
+    "files": [
+        "dist"
+    ],
+    "exports": {
+        ".": {
+            "import": "./dist/powereditor3.js",
+            "require": "./dist/powereditor3.umd.cjs",
+            "types": "./dist/types/packages/index.d.ts"
+        },
+        "./powereditor3.css": "./dist/powereditor3.css"
+    },
+    "type": "module",
+    "main": "dist/powereditor3.umd.cjs",
+    "module": "dist/powereditor3.js",
+    "scripts": {
+        "docs:dev": "vitepress dev docs",
+        "docs:build": "vitepress build docs",
+        "dev": "vite",
+        "build": "vue-tsc -b && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@creatorsn/vfluent3": "^0.3.0",
+        "autoprefixer": "^10.4.21",
+        "path": "^0.12.7",
+        "sass": "^1.89.2",
+        "url": "^0.11.4",
+        "vue": "^3.5.13"
+    },
+    "devDependencies": {
+        "@types/node": "^24.0.3",
+        "@vitejs/plugin-vue": "^5.2.3",
+        "@vue/tsconfig": "^0.7.0",
+        "typescript": "~5.8.3",
+        "vite": "^6.3.5",
+        "vitepress": "^1.6.3",
+        "vue-tsc": "^2.2.8"
+    }
+}

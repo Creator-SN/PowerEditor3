@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"lib": ["ESNext", "DOM"],
+		"moduleResolution": "Node",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"baseUrl": "./",
+		"paths": {
+			"@/*": ["src/*"]
+		}
+	},
+	"include": ["packages/**/*", "docs/**/*"],
+	"references": [{ "path": "./tsconfig.node.json" }]
+}
