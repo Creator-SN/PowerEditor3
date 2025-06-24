@@ -11,6 +11,6 @@ const { Layout } = DefaultTheme;
 const viteData = useData();
 
 watch(viteData.isDark, (val) => {
-	console.log(val);
+	console.log('isDark', val);
 });
 </script>

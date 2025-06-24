@@ -45,4 +45,10 @@ features:
     </a>
 </p>
 
-<power-editor style="width: 100%;"></power-editor>
+<power-editor :theme="viteData.isDark.value ? 'dark' : 'light'" style="width: 100%;"></power-editor>
+
+<script setup>
+import { useData } from "vitepress";
+
+const viteData = useData();
+</script>
