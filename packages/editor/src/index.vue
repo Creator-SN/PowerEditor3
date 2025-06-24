@@ -447,10 +447,11 @@ export default {
 		},
 		eventInit() {
 			this.$refs.container.addEventListener("scroll", (event) => {
-				this.$emit("container-scroll", {
-					el: this.$refs.container,
-					oriEvent: event,
-				});
+				if (this.$refs.container)
+					this.$emit("container-scroll", {
+						el: this.$refs.container,
+						oriEvent: event,
+					});
 			});
 			this.$refs.container.addEventListener("mouseup", () => {
 				let status =
