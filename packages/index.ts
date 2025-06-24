@@ -1,7 +1,9 @@
 import { App, Plugin } from 'vue';
+import PowerEditor from './editor';
 import DevC from './devC'
 
 const components = [
+    PowerEditor,
     DevC
 ]
 

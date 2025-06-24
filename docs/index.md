@@ -45,3 +45,4 @@ features:
     </a>
 </p>
 
+<power-editor style="width: 100%;"></power-editor>
