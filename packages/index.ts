@@ -18,6 +18,7 @@ export const PowerEditorPlugins: Plugin = {
 declare module 'vue' {
     export interface GlobalComponents {
         DevC: typeof DevC;
+        PowerEditor: typeof PowerEditor;
     }
 }
 
