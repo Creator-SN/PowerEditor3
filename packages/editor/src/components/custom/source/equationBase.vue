@@ -72,7 +72,7 @@ import onecolor from "onecolor";
 import { NodeViewWrapper } from "@tiptap/vue-3";
 import { TextSelection } from "prosemirror-state";
 
-import katex from 'katex';
+import katex from "katex";
 import "@/packages/editor/src/styles/katex.scss";
 
 // import 'katex/dist/katex.min.css';
@@ -234,14 +234,16 @@ export default {
 			}
 		},
 		showPos() {
-			let el = this.$refs.target;
-			let bottom = el.getBoundingClientRect().bottom;
-			let left = el.getBoundingClientRect().left;
-			if (bottom < 50) this.top = -100;
-			else this.top = 100;
-			if (left + 300 > document.body.clientWidth)
-				this.left = document.body - 300 - left;
-			else this.left = 0;
+			this.$nextTick(() => {
+				let el = this.$refs.target;
+				let bottom = el.getBoundingClientRect().bottom;
+				let left = el.getBoundingClientRect().left;
+				if (bottom < 50) this.top = -100;
+				else this.top = 100;
+				if (left + 300 > document.body.clientWidth)
+					this.left = document.body - 300 - left;
+				else this.left = 0;
+			});
 		},
 		show() {
 			if (!this.editor.isEditable) return;
@@ -261,7 +263,7 @@ export default {
 				selection = TextSelection.near(tr.doc.resolve(this.getPos()));
 			else
 				selection = TextSelection.near(
-					tr.doc.resolve(this.getPos() + this.node.nodeSize)
+					tr.doc.resolve(this.getPos() + this.node.nodeSize - 1)
 				);
 			tr.setSelection(selection);
 			this.editor.view.dispatch(tr);

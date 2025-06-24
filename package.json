@@ -27,7 +27,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@creatorsn/vfluent3": "^0.3.0",
+        "@creatorsn/vfluent3": "^0.3.2",
         "autoprefixer": "^10.4.21",
         "path": "^0.12.7",
         "sass": "^1.89.2",

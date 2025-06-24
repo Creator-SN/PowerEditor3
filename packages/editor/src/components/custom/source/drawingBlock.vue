@@ -24,8 +24,8 @@
                     background="rgba(245, 245, 245, 0.3)"
                     style="width: 150px; height: 100%; margin-left: 5px; margin-right: 5px"
                 >
-                    <template slot-scope="prop">
-                        <span style="height: 100%; margin-left: 5px; font-size: 12px; display: flex; align-items: center">{{ prop.value }}</span>
+                    <template v-slot:default="prop">
+                        <span style="height: 100%; margin-left: 5px; font-size: 12px; display: flex; align-items: center">{{ prop.modelValue }}</span>
                     </template>
                 </fv-slider>
                 <fv-button

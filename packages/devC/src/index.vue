@@ -2,13 +2,14 @@
 	<div class="dev-c-container">
 		<h1>{{ title }}</h1>
 		<p>{{ message }}</p>
-        <fv-button>Confirm</fv-button>
+		<fv-button>Confirm</fv-button>
 	</div>
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
 	title: {
+		type: [String],
 		default: "Dev C",
 	},
 });
@@ -32,6 +33,6 @@ export default {
 .dev-c-container {
 	padding: 10px;
 	background: whitesmoke;
-    border-radius: 8px;
+	border-radius: 8px;
 }
 </style>
