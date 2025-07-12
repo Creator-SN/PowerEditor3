@@ -45,10 +45,16 @@ features:
     </a>
 </p>
 
-<power-editor :theme="viteData.isDark.value ? 'dark' : 'light'" style="width: 100%;"></power-editor>
+<power-editor :theme="viteData.isDark.value ? 'dark' : 'light'" ref="editor" style="width: 100%;"></power-editor>
 
 <script setup>
+import { ref, onMounted } from "vue"
 import { useData } from "vitepress";
 
 const viteData = useData();
+
+const editor = ref(null);
+onMounted(() => {
+    console.log(editor.value.editor().commands);
+})
 </script>

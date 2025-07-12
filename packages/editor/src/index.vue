@@ -131,7 +131,7 @@
 <script setup>
 import { getCurrentInstance } from "vue";
 
-const { proxy } = getCurrentInstance();
+const { ref, proxy } = getCurrentInstance();
 
 const emits = defineEmits([
 	"content-change",
@@ -260,6 +260,7 @@ defineExpose({
 	saveMarkdown: (...args) => proxy.saveMarkdown(...args),
 	computeMarkdown: (...args) => proxy.computeMarkdown(...args),
 	insertMarkdown: (...args) => proxy.insertMarkdown(...args),
+	editor: () => proxy.$data.editor,
 });
 </script>
 
