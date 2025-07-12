@@ -12,8 +12,7 @@
     "exports": {
         ".": {
             "import": "./dist/powereditor3.js",
-            "require": "./dist/powereditor3.umd.cjs",
-            "types": "./dist/types/index.d.ts"
+            "require": "./dist/powereditor3.umd.cjs"
         },
         "./powereditor3.css": "./dist/powereditor3.css"
     },
