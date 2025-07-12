@@ -129,6 +129,10 @@
 </template>
 
 <script setup>
+import { getCurrentInstance } from "vue";
+
+const { proxy } = getCurrentInstance();
+
 const emits = defineEmits([
 	"content-change",
 	"on-mounted",
@@ -249,6 +253,13 @@ const props = defineProps({
 	theme: {
 		default: "light",
 	},
+});
+
+defineExpose({
+	save: (...args) => proxy.save(...args),
+	saveMarkdown: (...args) => proxy.saveMarkdown(...args),
+	computeMarkdown: (...args) => proxy.computeMarkdown(...args),
+	insertMarkdown: (...args) => proxy.insertMarkdown(...args),
 });
 </script>
 
