@@ -1,7 +1,7 @@
 {
     "name": "@creatorsn/powereditor3",
     "private": false,
-    "version": "0.1.2",
+    "version": "0.1.3",
     "publishConfig": {
         "access": "public"
     },
