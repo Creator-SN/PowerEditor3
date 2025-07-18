@@ -97,8 +97,8 @@
             class="power-editor-cmd-btn"
             :theme="thisTheme"
             border-color="transparent"
-            :background="getBackground(editor.storage.formatPainter.formatPainterStatus !== 'off')"
-            :foreground="getForeground(editor.storage.formatPainter.formatPainterStatus !== 'off')"
+            :background="getBackground(showFormatPainter)"
+            :foreground="getForeground(showFormatPainter)"
             :title="getTitle('Format Painter')"
             @click="formatPainterClick"
             @dblclick.native="formatPainterDoubleClick"
@@ -582,6 +582,15 @@ export default {
                 b: 'rgba(36, 36, 36, 1)',
             };
         },
+        formatPainterStatus() {
+			if (!this.editor) return "off";
+			if (!this.editor.storage) return "off";
+			if (!this.editor.storage.formatPainter) return "off";
+			return this.editor.storage.formatPainter.formatPainterStatus;
+		},
+		showFormatPainter() {
+			this.formatPainterStatus !== "off";
+		}
     },
     mounted() {
         this.thisTheme = this.theme;

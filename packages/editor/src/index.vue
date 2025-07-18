@@ -99,7 +99,7 @@
 			<slot name="front-content"></slot>
 			<editor-content
 				class="tip-tap-editor"
-				:class="[{ 'format-painter': formatPainterStatus !== 'off' }]"
+				:class="[{ 'format-painter': showFormatPainter }]"
 				:editor="editor"
 				:theme="theme"
 				ref="editor"
@@ -120,7 +120,6 @@
 				:foreground="foreground"
 				:language="language"
 				:tippy-options="{ duration: 100 }"
-				ref="bubbleToolBar"
 				:mobileMode="mobileMode"
 				:showSave="showSave"
 			></bubble-tool-bar>
@@ -340,6 +339,9 @@ export default {
 			if (!this.editor.storage) return "off";
 			if (!this.editor.storage.formatPainter) return "off";
 			return this.editor.storage.formatPainter.formatPainterStatus;
+		},
+		showFormatPainter() {
+			this.formatPainterStatus !== "off";
 		},
 	},
 	mounted() {

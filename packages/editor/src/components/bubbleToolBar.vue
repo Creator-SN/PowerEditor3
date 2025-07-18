@@ -51,8 +51,8 @@
         <fv-button
             class="power-editor-bubble-cmd-btn"
             :theme="thisTheme"
-            :background="getBackground(editor.storage.formatPainter.formatPainterStatus !== 'off')"
-            :foreground="getForeground(editor.storage.formatPainter.formatPainterStatus !== 'off')"
+            :background="getBackground(showFormatPainter)"
+            :foreground="getForeground(showFormatPainter)"
             :border-color="'transparent'"
             :title="getTitle('Format Painter')"
             @click="formatPainterClick"
@@ -216,6 +216,15 @@ export default {
                 b: 'rgba(36, 36, 36, 1)',
             };
         },
+        formatPainterStatus() {
+			if (!this.editor) return "off";
+			if (!this.editor.storage) return "off";
+			if (!this.editor.storage.formatPainter) return "off";
+			return this.editor.storage.formatPainter.formatPainterStatus;
+		},
+		showFormatPainter() {
+			this.formatPainterStatus !== "off";
+		}
     },
     mounted() {
         this.thisTheme = this.theme;
