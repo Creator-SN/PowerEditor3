@@ -15,12 +15,11 @@ export const PowerEditorPlugins: Plugin = {
     },
 };
 
-declare module '@vue/runtime-core' {
+declare module 'vue' {
     export interface GlobalComponents {
-        PowerEditor: typeof PowerEditor
-        DevC: typeof DevC
+        DevC: typeof DevC;
+        PowerEditor: typeof PowerEditor;
     }
 }
 
-export {}
 export default PowerEditorPlugins;
