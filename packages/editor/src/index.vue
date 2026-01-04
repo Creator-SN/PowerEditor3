@@ -259,7 +259,7 @@ defineExpose({
 	saveMarkdown: (...args) => proxy.saveMarkdown(...args),
 	computeMarkdown: (...args) => proxy.computeMarkdown(...args),
 	insertMarkdown: (...args) => proxy.insertMarkdown(...args),
-	editor: () => proxy.$data.editor,
+	editor: () => proxy.$data.editor, // this is a function
 });
 </script>
 
@@ -686,14 +686,11 @@ export default {
 			this.$emit("save-html", this.editor.getHTML());
 		},
 	},
-	beforeDestroy() {
-		this.editor.destroy();
+	beforeUnmount() {
+		if (this.editor) this.editor.destroy();
 		for (let key in this.timer) {
 			clearInterval(this.timer[key]);
 		}
-	},
-	beforeUnmount() {
-		this.editor.destroy();
 	},
 };
 </script>
