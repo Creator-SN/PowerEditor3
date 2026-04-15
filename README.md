@@ -15,7 +15,7 @@
 </h4>
 
 <p align="center">
-  <a href="https://creator-sn.github.io/PowerEditor3/via/">Documentation</a>
+  <a href="https://creator-sn.github.io/PowerEditor3">Documentation</a>
   ·
   <a href="https://www.npmjs.com/package/@creatorsn/powereditor3">npm</a>
   ·
@@ -85,7 +85,7 @@ const content = ref('<p>Hello PowerEditor3</p>');
 
 Read the full documentation, quick start guide and API reference:
 
-[https://creator-sn.github.io/PowerEditor3/via/](https://creator-sn.github.io/PowerEditor3/via/)
+[https://creator-sn.github.io/PowerEditor3](https://creator-sn.github.io/PowerEditor3)
 
 ## Development
 
