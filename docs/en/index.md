@@ -6,22 +6,22 @@ editLink: true
 lastUpdated: true
 hero:
   name: PowerEditor3
-  text: Vue 3 富文本编辑器
-  tagline: 基于 Vue 3、Tiptap 与 VFluent3 封装的富文本编辑器组件。
+  text: Vue 3 Rich Text Editor
+  tagline: A rich text editor component built with Vue 3, Tiptap and VFluent3.
   image:
     src: /assets/logo.svg
     alt: PowerEditor
   actions:
     - theme: brand
-      text: 查看主编辑器
-      link: /components/powerEditor/
+      text: Editor API
+      link: /en/components/powerEditor/
 features:
-  - title: 面向真实项目
-    details: 围绕业务系统中的内容编辑、只读展示、图片处理与 Markdown 互转场景设计。
-  - title: Vue 原生体验
-    details: 可直接在 Vue 页面和 VitePress Markdown 中使用组件。
-  - title: 灵活扩展
-    details: 支持自定义工具栏按钮、Mention 提及项、Markdown 解码插件和图片拦截流程。
+  - title: Production Ready
+    details: Designed around real editing scenarios in business applications.
+  - title: Vue Native
+    details: Use PowerEditor directly in Vue pages and VitePress Markdown files.
+  - title: Extensible
+    details: Customize toolbar buttons, Markdown decoding, mention behavior and image upload workflows.
 ---
 
 <script setup>
