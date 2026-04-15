@@ -47,7 +47,7 @@ export default defineConfig({
     title: 'PowerEditor3',
     description: '基于 VFluent3 封装的 Vue3 富文本编辑器组件',
     lang: 'zh-CN',
-    base: '/via/',
+    base: process.env.VITEPRESS_BASE ?? '/PowerEditor3/',
     lastUpdated: true,
     vite: {
         resolve: {
