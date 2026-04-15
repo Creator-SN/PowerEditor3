@@ -13,8 +13,8 @@ hero:
     alt: PowerEditor
   actions:
     - theme: brand
-      text: 查看主编辑器
-      link: /components/powerEditor/
+      text: 快速开始
+      link: /components/powerEditor/quick-start
 features:
   - title: 面向真实项目
     details: 围绕业务系统中的内容编辑、只读展示、图片处理与 Markdown 互转场景设计。

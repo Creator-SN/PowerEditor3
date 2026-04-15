@@ -5,6 +5,7 @@ const powerEditorSidebar = [
     {
         text: 'PowerEditor 主编辑器',
         items: [
+            { text: '快速开始', link: '/components/powerEditor/quick-start' },
             { text: '概览与 API', link: '/components/powerEditor/' }
         ]
     },
@@ -28,6 +29,7 @@ const powerEditorSidebarEn = [
     {
         text: 'PowerEditor',
         items: [
+            { text: 'Quick Start', link: '/en/components/powerEditor/quick-start' },
             { text: 'Overview and API', link: '/en/components/powerEditor/' }
         ]
     },

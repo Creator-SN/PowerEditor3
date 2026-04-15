@@ -13,8 +13,8 @@ hero:
     alt: PowerEditor
   actions:
     - theme: brand
-      text: Editor API
-      link: /en/components/powerEditor/
+      text: Quick Start
+      link: /en/components/powerEditor/quick-start
 features:
   - title: Production Ready
     details: Designed around real editing scenarios in business applications.
