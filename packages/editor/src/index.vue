@@ -86,7 +86,7 @@
 								editablePaddingTop
 									? editablePaddingTop
 									: toolbarHeight + 10
-						  }px`
+							}px`
 						: `${readOnlyPaddingTop}px`,
 				background: editorOutSideBackground,
 				'--link-color': linkColor,
@@ -260,6 +260,7 @@ defineExpose({
 	computeMarkdown: (...args) => proxy.computeMarkdown(...args),
 	insertMarkdown: (...args) => proxy.insertMarkdown(...args),
 	editor: () => proxy.$data.editor, // this is a function
+	focus: () => proxy.$data.editor.focus(),
 });
 </script>
 
@@ -400,7 +401,7 @@ export default {
 				this.defaultStorageInit(),
 				BubbleMenu.configure({
 					element: document.querySelector(
-						".power-editor-bubble-tool-bar"
+						".power-editor-bubble-tool-bar",
 					),
 					tippyOptions: {
 						maxWidth: "none",
@@ -432,7 +433,7 @@ export default {
 					Placeholder.configure({
 						emptyEditorClass: "is-editor-empty",
 						placeholder: () => this.placeholder,
-					})
+					}),
 				);
 			}
 			this.editor = new Editor({
@@ -544,7 +545,7 @@ export default {
 			};
 			this.editor.storage.defaultStorage.mentionItemTools = Object.assign(
 				mentionItemTools,
-				this.mentionItemAttr
+				this.mentionItemAttr,
 			);
 		},
 		insert(html) {
@@ -840,8 +841,8 @@ export default {
 			code {
 				padding: 4px 6px;
 				background-color: rgba(#616161, 0.1);
-				font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono",
-					monospace;
+				font-family:
+					Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
 				font-size: 1rem;
 				color: var(--code-color);
 				border-radius: 3px;
