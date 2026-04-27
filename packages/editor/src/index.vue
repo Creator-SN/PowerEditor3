@@ -260,7 +260,7 @@ defineExpose({
 	computeMarkdown: (...args) => proxy.computeMarkdown(...args),
 	insertMarkdown: (...args) => proxy.insertMarkdown(...args),
 	editor: () => proxy.$data.editor, // this is a function
-	focus: () => proxy.$data.editor.focus(),
+	focus: () => proxy.focus(),
 });
 </script>
 
