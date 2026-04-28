@@ -1,6 +1,6 @@
 <template>
     <callout-base
-        :show.sync="show"
+        v-model:show="show"
         :mobileMode="mobileMode"
         :title="getTitle('Headers')"
         :foreground="foreground"

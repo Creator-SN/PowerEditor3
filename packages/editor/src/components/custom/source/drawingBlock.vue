@@ -79,9 +79,9 @@
             </div>
         </div>
         <media-container
-            :width.sync="node.attrs.width"
+            v-model:width="node.attrs.width"
             :caption="node.attrs.caption"
-            :alignCenter.sync="node.attrs.alignCenter"
+            v-model:alignCenter="node.attrs.alignCenter"
             :editor="editor"
             :theme="thisTheme"
             :foreground="thisForeground"

@@ -1,5 +1,5 @@
 <template>
-    <callout-base :show.sync="show" :mobileMode="mobileMode" :title="getTitle('Table')" :foreground="foreground" :theme="theme" :language="language" :popperClass="['power-editor-table-callout']">
+    <callout-base v-model:show="show" :mobileMode="mobileMode" :title="getTitle('Table')" :foreground="foreground" :theme="theme" :language="language" :popperClass="['power-editor-table-callout']">
         <template v-slot:trigger="x">
             <slot :show="x.show"></slot>
         </template>

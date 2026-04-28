@@ -101,7 +101,7 @@
             :foreground="getForeground(showFormatPainter)"
             :title="getTitle('Format Painter')"
             @click="formatPainterClick"
-            @dblclick.native="formatPainterDoubleClick"
+            @dblclick.capture="formatPainterDoubleClick"
         >
             <i class="ms-Icon ms-Icon--Personalize"></i>
         </fv-button>
@@ -589,7 +589,7 @@ export default {
 			return this.editor.storage.formatPainter.formatPainterStatus;
 		},
 		showFormatPainter() {
-			this.formatPainterStatus !== "off";
+			return this.formatPainterStatus !== "off";
 		}
     },
     mounted() {

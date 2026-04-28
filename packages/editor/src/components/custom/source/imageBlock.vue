@@ -1,9 +1,9 @@
 <template>
     <node-view-wrapper v-if="node" class="power-editor-image-container" :class="[{ dark: thisTheme === 'dark' }]" :style="{ 'justify-content': node.attrs.alignCenter ? 'center' : 'flex-start' }">
         <media-container
-            :width.sync="node.attrs.width"
+            v-model:width="node.attrs.width"
             :caption="node.attrs.caption"
-            :alignCenter.sync="node.attrs.alignCenter"
+            v-model:alignCenter="node.attrs.alignCenter"
             :editor="editor"
             :theme="thisTheme"
             :foreground="thisForeground"
@@ -40,7 +40,7 @@
                         :src="node.attrs.src"
                         class="power-editor-preview-img"
                         :style="{ scale: previewImg.scalePercent + '%', cursor: previewImg.scalePercent < 150 ? 'zoom-in' : 'zoom-out' }"
-                        @click.native="previewImg.scalePercent < 100 ? setScale($event, 100) : previewImg.scalePercent < 150 ? setScale($event, 150) : setScale($event, 100)"
+                        @click.capture="previewImg.scalePercent < 100 ? setScale($event, 100) : previewImg.scalePercent < 150 ? setScale($event, 150) : setScale($event, 100)"
                     ></fv-img>
                 </div>
                 <div class="power-editor-preview-tool-bar" @click="$event.stopPropagation()">
