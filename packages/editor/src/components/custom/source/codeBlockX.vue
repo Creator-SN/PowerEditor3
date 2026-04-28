@@ -26,7 +26,7 @@
                 >
                     <i
                         class="ms-Icon"
-                        :class="[`ms-Icon--${status.copy ? 'Accept' : 'Copy'}`]"
+                        :class="[`ms-Icon--${status.copy ? 'Accept' : 'Set'}`]"
                     ></i>
                 </fv-button>
             </div>
