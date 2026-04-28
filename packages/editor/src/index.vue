@@ -342,7 +342,7 @@ export default {
 			return this.editor.storage.formatPainter.formatPainterStatus;
 		},
 		showFormatPainter() {
-			this.formatPainterStatus !== "off";
+			return this.formatPainterStatus !== "off";
 		},
 	},
 	mounted() {
