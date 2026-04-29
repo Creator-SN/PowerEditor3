@@ -3,9 +3,39 @@
 `PowerEditor` is the core rich text editor component in PowerEditor3. It is built with Vue 3, Tiptap and VFluent3, and provides a ready-to-use toolbar, theme switching, image preview, Markdown conversion, read-only display and slot-based customization.
 
 <script setup>
+import { ref } from "vue";
 import { useData } from "vitepress";
 
 const viteData = useData();
+const editor = ref(null);
+const mdFileInput = ref(null);
+const editorContent = ref("<h2>PowerEditor Markdown Demo</h2><p>Use the buttons on the right to import or export Markdown.</p>");
+
+const openMarkdownFile = () => {
+    mdFileInput.value?.click();
+};
+
+const handleMarkdownImport = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const markdown = await file.text();
+    editor.value?.insertMarkdown(markdown);
+    event.target.value = "";
+};
+
+const exportMarkdown = async () => {
+    const markdown = editor.value?.saveMarkdown?.() ?? "";
+
+    console.log(markdown);
+
+    try {
+        await navigator.clipboard.writeText(markdown);
+    } catch (error) {
+        console.warn("Copy markdown failed.", error);
+    }
+};
 </script>
 
 <power-editor :theme="viteData.isDark.value ? 'dark' : 'light'" style="width: 100%;"></power-editor>
@@ -78,8 +108,107 @@ const viteData = useData();
 
 Use a template ref to call exposed editor methods.
 
+<div class="power-editor-method-demo">
+    <input
+        ref="mdFileInput"
+        type="file"
+        accept=".md,.markdown,.txt,text/markdown,text/plain"
+        style="display: none;"
+        @change="handleMarkdownImport"
+    />
+    <power-editor
+        ref="editor"
+        v-model="editorContent"
+        :theme="viteData.isDark.value ? 'dark' : 'light'"
+        style="width: 100%;"
+    >
+        <template #custom-buttons-front="{ defaultClass }">
+            <fv-button
+                :class="[defaultClass, 'power-editor-method-btn']"
+                :theme="viteData.isDark.value ? 'dark' : 'light'"
+                border-color="transparent"
+                title="Import Markdown"
+                @click="openMarkdownFile"
+            >
+                <i class="ms-Icon ms-Icon--Upload"></i>
+            </fv-button>
+            <fv-button
+                :class="[defaultClass, 'power-editor-method-btn']"
+                :theme="viteData.isDark.value ? 'dark' : 'light'"
+                border-color="transparent"
+                title="Export Markdown"
+                @click="exportMarkdown"
+            >
+                <i class="ms-Icon ms-Icon--Download"></i>
+            </fv-button>
+        </template>
+    </power-editor>
+</div>
+
 ```vue
-<power-editor ref="editor" />
+<script setup>
+import { ref } from "vue";
+
+const editor = ref(null);
+const mdFileInput = ref(null);
+
+const openMarkdownFile = () => {
+    mdFileInput.value?.click();
+};
+
+const handleMarkdownImport = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const markdown = await file.text();
+    editor.value?.insertMarkdown(markdown);
+    event.target.value = "";
+};
+
+const exportMarkdown = async () => {
+    const markdown = editor.value?.saveMarkdown?.() ?? "";
+
+    console.log(markdown);
+    await navigator.clipboard.writeText(markdown);
+};
+</script>
+
+<template>
+    <input
+        ref="mdFileInput"
+        type="file"
+        accept=".md,.markdown,.txt,text/markdown,text/plain"
+        style="display: none;"
+        @change="handleMarkdownImport"
+    />
+    <power-editor ref="editor">
+        <template #custom-buttons="{ defaultClass }">
+            <fv-button
+                :class="[defaultClass, 'round-btn']"
+                border-color="transparent"
+                title="Import Markdown"
+                @click="openMarkdownFile"
+            >
+                <i class="ms-Icon ms-Icon--Upload"></i>
+            </fv-button>
+            <fv-button
+                :class="[defaultClass, 'round-btn']"
+                border-color="transparent"
+                title="Export Markdown"
+                @click="exportMarkdown"
+            >
+                <i class="ms-Icon ms-Icon--Download"></i>
+            </fv-button>
+        </template>
+    </power-editor>
+</template>
+
+<style scoped>
+.round-btn {
+    border-radius: 999px;
+}
+</style>
 ```
 
 | Method | Description |
@@ -109,6 +238,16 @@ Slot props:
     </template>
 </power-editor>
 ```
+
+<style scoped>
+.power-editor-method-demo {
+    margin: 16px 0 20px;
+}
+
+.power-editor-method-btn {
+    border-radius: 999px;
+}
+</style>
 
 ### `front-content`
 

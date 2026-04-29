@@ -3,9 +3,39 @@
 `PowerEditor` 是 PowerEditor3 的核心富文本编辑器组件，基于 Vue 3、Tiptap 与 VFluent3 封装。它提供开箱即用的工具栏、主题切换、图片预览、Markdown 互转、只读展示与插槽扩展能力，适合在业务系统中快速接入可编辑内容区域。
 
 <script setup>
+import { ref } from "vue";
 import { useData } from "vitepress";
 
 const viteData = useData();
+const editor = ref(null);
+const mdFileInput = ref(null);
+const editorContent = ref("<h2>PowerEditor Markdown Demo</h2><p>点击右上角按钮导入或导出 Markdown。</p>");
+
+const openMarkdownFile = () => {
+    mdFileInput.value?.click();
+};
+
+const handleMarkdownImport = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const markdown = await file.text();
+    editor.value?.insertMarkdown(markdown);
+    event.target.value = "";
+};
+
+const exportMarkdown = async () => {
+    const markdown = editor.value?.saveMarkdown?.() ?? "";
+
+    console.log(markdown);
+
+    try {
+        await navigator.clipboard.writeText(markdown);
+    } catch (error) {
+        console.warn("Copy markdown failed.", error);
+    }
+};
 </script>
 
 <power-editor :theme="viteData.isDark.value ? 'dark' : 'light'" style="width: 100%;"></power-editor>
@@ -78,8 +108,107 @@ const viteData = useData();
 
 通过 `ref` 可以调用编辑器暴露的方法。
 
+<div class="power-editor-method-demo">
+    <input
+        ref="mdFileInput"
+        type="file"
+        accept=".md,.markdown,.txt,text/markdown,text/plain"
+        style="display: none;"
+        @change="handleMarkdownImport"
+    />
+    <power-editor
+        ref="editor"
+        v-model="editorContent"
+        :theme="viteData.isDark.value ? 'dark' : 'light'"
+        style="width: 100%;"
+    >
+        <template #custom-buttons-front="{ defaultClass }">
+            <fv-button
+                :class="[defaultClass, 'power-editor-method-btn']"
+                :theme="viteData.isDark.value ? 'dark' : 'light'"
+                border-color="transparent"
+                title="导入 Markdown"
+                @click="openMarkdownFile"
+            >
+                <i class="ms-Icon ms-Icon--Upload"></i>
+            </fv-button>
+            <fv-button
+                :class="[defaultClass, 'power-editor-method-btn']"
+                :theme="viteData.isDark.value ? 'dark' : 'light'"
+                border-color="transparent"
+                title="导出 Markdown"
+                @click="exportMarkdown"
+            >
+                <i class="ms-Icon ms-Icon--Download"></i>
+            </fv-button>
+        </template>
+    </power-editor>
+</div>
+
 ```vue
-<power-editor ref="editor" />
+<script setup>
+import { ref } from "vue";
+
+const editor = ref(null);
+const mdFileInput = ref(null);
+
+const openMarkdownFile = () => {
+    mdFileInput.value?.click();
+};
+
+const handleMarkdownImport = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const markdown = await file.text();
+    editor.value?.insertMarkdown(markdown);
+    event.target.value = "";
+};
+
+const exportMarkdown = async () => {
+    const markdown = editor.value?.saveMarkdown?.() ?? "";
+
+    console.log(markdown);
+    await navigator.clipboard.writeText(markdown);
+};
+</script>
+
+<template>
+    <input
+        ref="mdFileInput"
+        type="file"
+        accept=".md,.markdown,.txt,text/markdown,text/plain"
+        style="display: none;"
+        @change="handleMarkdownImport"
+    />
+    <power-editor ref="editor">
+        <template #custom-buttons="{ defaultClass }">
+            <fv-button
+                :class="[defaultClass, 'round-btn']"
+                border-color="transparent"
+                title="导入 Markdown"
+                @click="openMarkdownFile"
+            >
+                <i class="ms-Icon ms-Icon--Upload"></i>
+            </fv-button>
+            <fv-button
+                :class="[defaultClass, 'round-btn']"
+                border-color="transparent"
+                title="导出 Markdown"
+                @click="exportMarkdown"
+            >
+                <i class="ms-Icon ms-Icon--Download"></i>
+            </fv-button>
+        </template>
+    </power-editor>
+</template>
+
+<style scoped>
+.round-btn {
+    border-radius: 999px;
+}
+</style>
 ```
 
 | 方法 | 说明 |
@@ -109,6 +238,16 @@ const viteData = useData();
     </template>
 </power-editor>
 ```
+
+<style scoped>
+.power-editor-method-demo {
+    margin: 16px 0 20px;
+}
+
+.power-editor-method-btn {
+    border-radius: 999px;
+}
+</style>
 
 ### `front-content`
 
