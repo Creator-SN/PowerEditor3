@@ -14,15 +14,7 @@
 
 		<template v-slot:header="x">
 			<div class="power-editor-emoji-banner">
-				<p
-					style="
-						width: 10px;
-						font-size: 13.8px;
-						flex: 1;
-                        font-weight: bold;
-						text-align: center;
-					"
-				>
+				<p class="emoji-title">
 					{{ getTitle(x.title) }}
 				</p>
 				<fv-button
@@ -139,6 +131,13 @@ export default {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+
+		.emoji-title {
+			width: 10px;
+			font-size: 13.8px;
+			flex: 1;
+			font-weight: bold;
+		}
 	}
 
 	div.main {
@@ -198,13 +197,21 @@ export default {
 		position: relative;
 		width: 50%;
 		height: 35px;
-        flex: 1;
+		flex: 1;
 		padding: 0px 5px;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: row-reverse;
 		justify-content: space-between;
 		align-items: center;
+
+		.emoji-title {
+            width: 10px;
+			font-size: 13.8px;
+			flex: 1;
+			font-weight: bold;
+			text-align: center;
+		}
 	}
 }
 </style>
