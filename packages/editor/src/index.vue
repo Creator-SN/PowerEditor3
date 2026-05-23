@@ -112,18 +112,24 @@
 				}"
 			/>
 		</div>
-		<div class="power-editor-bubble-tool-bar">
+		<tiptap-bubble-menu
+			v-if="editor && editable"
+			:editor="editor"
+			:options="{
+				placement: 'top',
+				offset: 8,
+			}"
+			:should-show="bubbleMenuShouldShow"
+		>
 			<bubble-tool-bar
-				v-if="editor && editable"
 				:editor="editor"
 				:theme="theme"
 				:foreground="foreground"
 				:language="language"
-				:tippy-options="{ duration: 100 }"
 				:mobileMode="mobileMode"
 				:showSave="showSave"
 			></bubble-tool-bar>
-		</div>
+		</tiptap-bubble-menu>
 	</div>
 </template>
 
@@ -266,6 +272,7 @@ defineExpose({
 
 <script>
 import { Editor, EditorContent } from "@tiptap/vue-3";
+import { BubbleMenu as TiptapBubbleMenu } from "@tiptap/vue-3/menus";
 import { Extension } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -282,8 +289,6 @@ import { Table } from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
-import BubbleMenu from "@tiptap/extension-bubble-menu";
-
 import { lowlight } from "./js/lowlight";
 import { Encoder, Decoder } from "./js/markdown";
 
@@ -306,6 +311,7 @@ export default {
 	name: "PowerEditor",
 	components: {
 		EditorContent,
+		TiptapBubbleMenu,
 		toolBar,
 		bubbleToolBar,
 	},
@@ -399,32 +405,6 @@ export default {
 				TableHeader,
 				TableCell,
 				this.defaultStorageInit(),
-				BubbleMenu.configure({
-					element: document.querySelector(
-						".power-editor-bubble-tool-bar",
-					),
-					tippyOptions: {
-						maxWidth: "none",
-					},
-					shouldShow: ({
-						editor,
-						view,
-						state,
-						oldState,
-						from,
-						to,
-					}) => {
-						// only show the bubble menu for images and links
-						if (state.selection.from === state.selection.to)
-							return false;
-						return !(
-							editor.isActive("imageblock") ||
-							editor.isActive("equationBlock") ||
-							editor.isActive("embedblock") ||
-							editor.isActive("drawingBlock")
-						);
-					},
-				}),
 				FormatPainter,
 				...this.extensions,
 			];
@@ -479,6 +459,22 @@ export default {
 					}
 				}
 			});
+		},
+		bubbleMenuShouldShow({ editor, view, state, from, to }) {
+			const hasSelection = from !== to;
+			const hasSelectedText =
+				!!state.doc.textBetween(from, to, " ").trim().length;
+
+			if (!view.hasFocus() || !hasSelection || !hasSelectedText) {
+				return false;
+			}
+
+			return !(
+				editor.isActive("imageblock") ||
+				editor.isActive("equationBlock") ||
+				editor.isActive("embedblock") ||
+				editor.isActive("drawingBlock")
+			);
 		},
 		defaultStorageInit() {
 			const defaultStorage = Extension.create({

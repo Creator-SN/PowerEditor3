@@ -375,6 +375,7 @@ export default {
 			});
 		},
 		closeWithLeftRight(event) {
+			if (!this.$refs.target) return;
 			let startPos = this.$refs.target.selectionStart;
 			let endPos = this.$refs.target.selectionEnd;
 			if (startPos !== endPos) {
