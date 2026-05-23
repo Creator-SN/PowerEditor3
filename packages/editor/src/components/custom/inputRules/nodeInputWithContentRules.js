@@ -1,5 +1,5 @@
 import { callOrReturn, findParentNode, getAttributes, InputRule } from '@tiptap/core';
-import { TextSelection } from 'prosemirror-state';
+import { TextSelection } from '@tiptap/pm/state';
 
 export function nodeInputWithContentRule({ find, type, getAttributes, content, overlapIgnore = [] }) {
     return new InputRule({

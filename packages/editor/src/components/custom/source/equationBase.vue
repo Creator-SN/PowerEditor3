@@ -70,7 +70,7 @@
 <script>
 import onecolor from "onecolor";
 import { NodeViewWrapper } from "@tiptap/vue-3";
-import { TextSelection } from "prosemirror-state";
+import { TextSelection } from "@tiptap/pm/state";
 
 import katex from "katex";
 import "@/packages/editor/src/styles/katex.scss";

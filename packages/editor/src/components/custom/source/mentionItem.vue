@@ -142,7 +142,7 @@
 <script>
 import { NodeViewWrapper } from "@tiptap/vue-3";
 import onecolor from "onecolor";
-import { TextSelection } from "prosemirror-state";
+import { TextSelection } from "@tiptap/pm/state";
 
 export default {
 	components: {
