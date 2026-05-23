@@ -1,5 +1,8 @@
 <template>
-	<node-view-wrapper class="power-editor-code-block">
+	<node-view-wrapper
+		class="power-editor-code-block"
+		:class="[{ dark: thisTheme === 'dark' }]"
+	>
         <div
             contenteditable="false"
             class="power-editor-code-block-banner"
@@ -10,20 +13,20 @@
 			<div class="power-editor-code-block-banner-right-block">
 				<fv-DropDown
 					v-show="editor.storage.defaultStorage.codeBlockLanguagesBox"
-                    v-model="selectedLanguage"
-                    placeholder="Select language"
-					theme="dark"
+					v-model="selectedLanguage"
+					placeholder="Select language"
+					:theme="thisTheme"
 					:options="languages"
 					:max-height="'300px'"
-                    style="width: 120px; height: 25px;"
+					style="width: 120px; height: 25px;"
 				>
 					<template v-slot:drop-carrier="x">
 						<fv-button
-							:theme="'dark'"
+							:theme="x.theme"
 							icon="ChevronDown"
 							:is-box-shadow="true"
-							background="rgba(36, 36, 36, 1)"
-                            font-size="10"
+							:background="actionButtonBackground"
+							font-size="10"
 							class="power-editor-code-block-action-btn"
 							:title="selectedLanguage[0].text || 'Select language'"
 							border-radius="6"
@@ -34,9 +37,9 @@
 					</template>
 				</fv-DropDown>
 				<fv-button
-					theme="dark"
-					background="rgba(36, 36, 36, 1)"
-                    font-size="10"
+					:theme="thisTheme"
+					:background="actionButtonBackground"
+					font-size="10"
 					:is-box-shadow="true"
 					class="power-editor-code-block-action-btn"
 					:title="status.copy ? 'Copied' : 'Copy'"
@@ -123,6 +126,7 @@ export default {
 
 	data() {
 		return {
+			thisTheme: this.editor.storage.defaultStorage.theme,
 			status: {
 				copy: false,
 			},
@@ -133,9 +137,17 @@ export default {
 	},
 
 	watch: {
+		'editor.storage.defaultStorage.theme'(val) {
+			this.thisTheme = val;
+		},
 	},
 
 	computed: {
+		actionButtonBackground() {
+			return this.thisTheme === 'dark'
+				? 'rgba(36, 36, 36, 1)'
+				: 'rgba(255, 255, 255, 1)';
+		},
 		languages() {
 			let languages = this.extension.options.lowlight.listLanguages();
 			let result = [];
@@ -199,7 +211,8 @@ export default {
 	position: relative;
 
 	padding-top: 30px;
-	background-color: rgba(25, 25, 25, 1);
+	background-color: rgba(248, 248, 248, 1);
+	border: rgba(50, 49, 48, 0.12) solid thin;
 	border-radius: 8px;
 
 	.power-editor-code-block-banner {
@@ -222,7 +235,7 @@ export default {
 			.power-editor-code-block-language {
 				margin-left: 10px;
 				font-size: 12px;
-				color: rgba(245, 245, 245, 0.6);
+				color: rgba(50, 49, 48, 0.6);
 				cursor: default;
 			}
 		}
@@ -276,9 +289,27 @@ export default {
 	.power-editor-code-block-pre {
 		margin: 0px;
 		padding: 0.75rem 1rem;
+		color: rgba(36, 36, 36, 1);
 
 		&.lineNumber {
 			padding-left: 40px;
+		}
+	}
+
+	&.dark {
+		background-color: rgba(13, 13, 13, 1);
+		border-color: transparent;
+
+		.power-editor-code-block-banner {
+			.power-editor-code-block-banner-left-block {
+				.power-editor-code-block-language {
+					color: rgba(245, 245, 245, 0.6);
+				}
+			}
+		}
+
+		.power-editor-code-block-pre {
+			color: rgba(245, 245, 245, 1);
 		}
 	}
 }

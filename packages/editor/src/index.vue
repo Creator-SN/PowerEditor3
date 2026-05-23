@@ -462,8 +462,9 @@ export default {
 		},
 		bubbleMenuShouldShow({ editor, view, state, from, to }) {
 			const hasSelection = from !== to;
-			const hasSelectedText =
-				!!state.doc.textBetween(from, to, " ").trim().length;
+			const hasSelectedText = !!state.doc
+				.textBetween(from, to, " ")
+				.trim().length;
 
 			if (!view.hasFocus() || !hasSelection || !hasSelectedText) {
 				return false;
@@ -845,10 +846,12 @@ export default {
 			}
 
 			pre {
-				background: #0d0d0d;
-				color: #fff;
+				background: rgba(248, 248, 248, 1);
+				color: rgba(36, 36, 36, 1);
 				font-family: "JetBrainsMono", monospace;
 				border-radius: 0.5rem;
+				border-top-left-radius: 0px;
+				border-top-right-radius: 0px;
 
 				code {
 					padding: 0;
@@ -858,7 +861,7 @@ export default {
 
 				.hljs-comment,
 				.hljs-quote {
-					color: #616161;
+					color: #6a737d;
 				}
 
 				.hljs-variable,
@@ -871,7 +874,7 @@ export default {
 				.hljs-name,
 				.hljs-selector-id,
 				.hljs-selector-class {
-					color: #f98181;
+					color: #d73a49;
 				}
 
 				.hljs-number,
@@ -881,23 +884,23 @@ export default {
 				.hljs-literal,
 				.hljs-type,
 				.hljs-params {
-					color: #fbbc88;
+					color: #005cc5;
 				}
 
 				.hljs-string,
 				.hljs-symbol,
 				.hljs-bullet {
-					color: #b9f18d;
+					color: #032f62;
 				}
 
 				.hljs-title,
 				.hljs-section {
-					color: #faf594;
+					color: #6f42c1;
 				}
 
 				.hljs-keyword,
 				.hljs-selector-tag {
-					color: #70cff8;
+					color: #d73a49;
 				}
 
 				.hljs-emphasis {
@@ -1038,6 +1041,56 @@ export default {
 
 			code {
 				background-color: rgba(72, 72, 72, 1);
+			}
+
+			pre {
+				background: rgba(13, 13, 13, 1);
+				color: #fff;
+				border-color: transparent;
+
+				.hljs-comment,
+				.hljs-quote {
+					color: #616161;
+				}
+
+				.hljs-variable,
+				.hljs-template-variable,
+				.hljs-attribute,
+				.hljs-tag,
+				.hljs-name,
+				.hljs-regexp,
+				.hljs-link,
+				.hljs-name,
+				.hljs-selector-id,
+				.hljs-selector-class {
+					color: #f98181;
+				}
+
+				.hljs-number,
+				.hljs-meta,
+				.hljs-built_in,
+				.hljs-builtin-name,
+				.hljs-literal,
+				.hljs-type,
+				.hljs-params {
+					color: #fbbc88;
+				}
+
+				.hljs-string,
+				.hljs-symbol,
+				.hljs-bullet {
+					color: #b9f18d;
+				}
+
+				.hljs-title,
+				.hljs-section {
+					color: #faf594;
+				}
+
+				.hljs-keyword,
+				.hljs-selector-tag {
+					color: #70cff8;
+				}
 			}
 
 			table {
