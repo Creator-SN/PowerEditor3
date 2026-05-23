@@ -338,6 +338,11 @@ export default {
 		},
 		theme() {
 			this.propsSync();
+			if (this.editor?.view) { // tiptap 3.23.6有懒更新, NodeView 组件的刷新时机被 Tiptap 绑定在编辑器更新周期上了, 这里建立一个空的state, 让editor更新一下.
+				this.editor.view.dispatch(
+					this.editor.state.tr.setMeta("theme-change", this.theme),
+				);
+			}
 		},
 	},
 	computed: {
