@@ -3,12 +3,11 @@
 		class="power-editor-code-block"
 		:class="[{ dark: thisTheme === 'dark' }]"
 	>
-        <div
-            contenteditable="false"
-            class="power-editor-code-block-banner"
-        >
+		<div contenteditable="false" class="power-editor-code-block-banner">
 			<div class="power-editor-code-block-banner-left-block">
-                <p class="power-editor-code-block-language">{{node.attrs.language}}</p>
+				<p class="power-editor-code-block-language">
+					{{ node.attrs.language || "auto" }}
+				</p>
 			</div>
 			<div class="power-editor-code-block-banner-right-block">
 				<fv-DropDown
@@ -18,19 +17,20 @@
 					:theme="thisTheme"
 					:options="languages"
 					:max-height="'300px'"
-					style="width: 120px; height: 25px;"
+					style="width: 120px; height: 25px"
 				>
 					<template v-slot:drop-carrier="x">
 						<fv-button
 							:theme="x.theme"
 							icon="ChevronDown"
-							:is-box-shadow="true"
 							:background="actionButtonBackground"
 							font-size="10"
 							class="power-editor-code-block-action-btn"
-							:title="selectedLanguage[0].text || 'Select language'"
+							:title="
+								selectedLanguage[0].text || 'Select language'
+							"
 							border-radius="6"
-							style="width: 80px; float: right;"
+							style="width: 80px; float: right"
 						>
 							{{ selectedLanguage[0].text || "Default" }}
 						</fv-button>
@@ -40,9 +40,9 @@
 					:theme="thisTheme"
 					:background="actionButtonBackground"
 					font-size="10"
-					:is-box-shadow="true"
 					class="power-editor-code-block-action-btn"
 					:title="status.copy ? 'Copied' : 'Copy'"
+					border-radius="6"
 					@click="copyCode"
 				>
 					<i
@@ -54,7 +54,12 @@
 		</div>
 		<pre
 			class="power-editor-code-block-pre"
-            :class="[{lineNumber: editor.storage.defaultStorage.codeBlockLineNumbers}]"
+			:class="[
+				{
+					lineNumber:
+						editor.storage.defaultStorage.codeBlockLineNumbers,
+				},
+			]"
 		><code><node-view-content /></code></pre>
 		<div
 			v-if="editor.storage.defaultStorage.codeBlockLineNumbers"
@@ -67,14 +72,14 @@
 				class="power-editor-code-block-line-number-item"
 				:title="index + 1"
 			>
-                {{index + 1}}
+				{{ index + 1 }}
 			</div>
 		</div>
 	</node-view-wrapper>
 </template>
 
 <script>
-import { NodeViewContent, NodeViewWrapper } from '@tiptap/vue-3';
+import { NodeViewContent, NodeViewWrapper } from "@tiptap/vue-3";
 
 export default {
 	components: {
@@ -137,16 +142,16 @@ export default {
 	},
 
 	watch: {
-		'editor.storage.defaultStorage.theme'(val) {
+		"editor.storage.defaultStorage.theme"(val) {
 			this.thisTheme = val;
 		},
 	},
 
 	computed: {
 		actionButtonBackground() {
-			return this.thisTheme === 'dark'
-				? 'rgba(36, 36, 36, 1)'
-				: 'rgba(255, 255, 255, 1)';
+			return this.thisTheme === "dark"
+				? "rgba(36, 36, 36, 1)"
+				: "rgba(255, 255, 255, 1)";
 		},
 		languages() {
 			let languages = this.extension.options.lowlight.listLanguages();
@@ -155,36 +160,37 @@ export default {
 			for (let i = 0; i < languages.length; i++) {
 				result.push({
 					key: languages[i],
-                    text: languages[i][0].toUpperCase() + languages[i].slice(1).toLowerCase(),
+					text:
+						languages[i][0].toUpperCase() +
+						languages[i].slice(1).toLowerCase(),
 				});
 			}
 
 			result.unshift({
-                key: '',
-                text: 'Default',
+				key: "auto",
+				text: "Default",
 			});
 
 			return result;
 		},
-        selectedLanguage: {
-            get() {
-                let lan = this.languages.find(
+		selectedLanguage: {
+			get() {
+				let lan = this.languages.find(
 					(it) => it.key === this.node.attrs.language,
 				);
-                if(lan) return [lan];
-                return [this.languages[0]];
-            },
-            set(val) {
-                if(val.length === 0) return;
-                this.updateAttributes({
-                    language: val[0].key,
-                });
-            }
-        }
+				if (lan) return [lan];
+				return [this.languages[0]];
+			},
+			set(val) {
+				if (val.length === 0) return;
+				this.updateAttributes({
+					language: val[0].key,
+				});
+			},
+		},
 	},
 
-	mounted() {
-	},
+	mounted() {},
 	methods: {
 		copyCode() {
 			if (this.status.copy) {
@@ -192,11 +198,11 @@ export default {
 			}
 			this.status.copy = true;
 			let code = this.node.textContent;
-            let textArea = document.createElement('textarea');
+			let textArea = document.createElement("textarea");
 			textArea.value = code;
 			document.body.appendChild(textArea);
 			textArea.select();
-            document.execCommand('copy');
+			document.execCommand("copy");
 			document.body.removeChild(textArea);
 			this.timer.copy = setTimeout(() => {
 				this.status.copy = false;
@@ -246,7 +252,7 @@ export default {
 			display: flex;
 			justify-content: flex-end;
 			align-items: center;
-			gap: 5px;
+			gap: 3px;
 
 			.power-editor-code-block-action-btn {
 				width: 25px;
