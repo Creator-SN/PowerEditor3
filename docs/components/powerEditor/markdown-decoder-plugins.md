@@ -2,6 +2,85 @@
 
 `PowerEditor` 内置 Markdown 解码器，可以将编辑器中的 ProseMirror 节点和标记转换为 Markdown。通过 `mdDecNodeFuncsPlugins` 与 `mdFlags`，你可以覆盖或补充某些节点、标记的输出方式。
 
+<script setup>
+import { ref } from "vue";
+import { useData } from "vitepress";
+
+const viteData = useData();
+const editor = ref(null);
+const mdFileInput = ref(null);
+const markdownFileName = ref("power-editor.md");
+const editorContent = ref(`<h2>Markdown Decoder Demo</h2><p>点击工具栏前面的 MD 按钮导入本地 Markdown，再点击保存导出当前富文本对应的 Markdown。</p>`);
+
+const openMarkdownFile = () => {
+    mdFileInput.value?.click();
+};
+
+const handleMarkdownImport = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    markdownFileName.value = file.name.replace(/\.(txt|markdown)$/i, ".md");
+    const markdown = await file.text();
+    editor.value?.insertMarkdown(markdown);
+    event.target.value = "";
+};
+
+const saveMarkdownFile = () => {
+    const markdown = editor.value?.saveMarkdown?.() ?? "";
+    const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    console.log(markdown);
+    link.href = url;
+    link.download = markdownFileName.value || "power-editor.md";
+    link.click();
+
+    URL.revokeObjectURL(url);
+};
+</script>
+
+## 在线试一下
+
+<div class="markdown-decoder-demo">
+    <input
+        ref="mdFileInput"
+        type="file"
+        accept=".md,.markdown,.txt,text/markdown,text/plain"
+        style="display: none;"
+        @change="handleMarkdownImport"
+    />
+    <power-editor
+        ref="editor"
+        v-model="editorContent"
+        :theme="viteData.isDark.value ? 'dark' : 'light'"
+        style="width: 100%;"
+    >
+        <template #custom-buttons-front="{ defaultClass }">
+            <fv-button
+                :class="[defaultClass, 'markdown-decoder-demo-btn', 'markdown-decoder-demo-md-btn']"
+                :theme="viteData.isDark.value ? 'dark' : 'light'"
+                border-color="transparent"
+                title="导入本地 Markdown"
+                @click="openMarkdownFile"
+            >
+                MD
+            </fv-button>
+            <fv-button
+                :class="[defaultClass, 'markdown-decoder-demo-btn']"
+                :theme="viteData.isDark.value ? 'dark' : 'light'"
+                border-color="transparent"
+                title="将当前富文本保存为 Markdown"
+                @click="saveMarkdownFile"
+            >
+                <i class="ms-Icon ms-Icon--Save"></i>
+            </fv-button>
+        </template>
+    </power-editor>
+</div>
+
 ## 工作方式
 
 解码器会按深度优先顺序递归遍历 ProseMirror 文档。普通节点会使用默认解码函数；你只需要为自定义节点或需要特殊格式的节点编写插件函数。
@@ -116,3 +195,19 @@ textStyle(text, mark) {
 ```
 
 当返回对象时，`prefix` 会写在文本前，`suffix` 会写在文本后，适合处理成对包裹的 Markdown 或 HTML 语法。
+
+<style scoped>
+.markdown-decoder-demo {
+    margin: 16px 0 24px;
+}
+
+.markdown-decoder-demo-btn {
+    border-radius: 999px;
+}
+
+.markdown-decoder-demo-md-btn {
+    min-width: 40px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+</style>
