@@ -52,6 +52,7 @@
                     theme="dark"
                     :disabled="link === ''"
                     :background="foreground"
+                    border-radius="6"
                     :is-box-shadow="true"
                     style="width: 150px;"
                     @click="insert"

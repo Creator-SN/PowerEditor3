@@ -170,10 +170,10 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
-"@creatorsn/vfluent3@^0.3.13":
-  version "0.3.13"
-  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.13.tgz#c0ad18bc99f7a208e1d521b7871f8e831392012e"
-  integrity sha512-uNkAVWqePyn+B4I6n1lp031mHTbxdBzEkotodtAO5pNvYgMLZ7qreTgKhf7ucwXhl2BREj7kobYbRM2EAAWrOA==
+"@creatorsn/vfluent3@^0.3.67":
+  version "0.3.67"
+  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.67.tgz#5a91b0246d8fa5732367fd43bdaaae24bed28ed0"
+  integrity sha512-3+AWcqTWzMqs5+XeLi23+7BYXbzRAb0auj3AeqCUdCWYr/ajebRVrRuuDE85bmDF++lBMAY3dKCT6CBPpUGtCA==
   dependencies:
     "@vue/shared" "^3.4.20"
     gsap "3.1.1"

@@ -19,7 +19,38 @@ export default Node.create({
                 default: '',
             },
             currentItem: {
-                default: {}
+                default: () => ({}),
+                // 解析HTML时，将data-current-item属性转换为对象
+                parseHTML: element => {
+                    const raw = element.getAttribute('data-current-item');
+
+                    if (!raw || raw === '[object Object]') {
+                        return {};
+                    }
+
+                    try {
+                        return JSON.parse(raw);
+                    } catch (e) {
+                        return {};
+                    }
+                },
+                // 渲染HTML时，将对象转换为字符串
+                renderHTML: attributes => {
+                    const currentItem = attributes.currentItem;
+
+                    if (
+                        !currentItem ||
+                        typeof currentItem !== 'object' ||
+                        Array.isArray(currentItem) ||
+                        Object.keys(currentItem).length === 0
+                    ) {
+                        return {};
+                    }
+
+                    return {
+                        'data-current-item': JSON.stringify(currentItem),
+                    };
+                }
             },
             placeholder: {
                 default: 'mention',

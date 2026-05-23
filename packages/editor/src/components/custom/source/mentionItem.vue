@@ -3,7 +3,11 @@
 		v-if="node"
 		as="span"
 		class="power-editor-mention-container"
-		:class="{ dark: thisTheme === 'dark', selected: selected }"
+		:class="{
+			dark: thisTheme === 'dark',
+			selected: selected,
+			showing: showPopper && filterItems.length > 0,
+		}"
 		:style="{
 			'--selected-bg': focusForeground,
 			'--selected-bg-hover': hoverForeground,
@@ -33,18 +37,22 @@
 					:theme="thisTheme"
 					class="power-editor-mention-popper-list-view"
 					ref="list"
+					itemBorderRadius="6"
+					:itemBorderWidth="1"
+					:itemBorderColor="'rgba(120, 120, 120, 0.1)'"
+					:rowHeight="30"
 					@chooseItem="chooseItem"
 				>
 					<template v-slot:listItem="x">
 						<img
 							v-if="x.item.image"
+							class="power-editor-mention-img"
+							:class="[{ avatar: x.item.avatarImg }]"
 							:src="x.valueTrigger(x.item.image)"
 							alt=""
-							style="
-								width: auto;
-								height: 30px;
-								margin-right: 15px;
-							"
+							:style="{
+								width: `${x.item.imageWidth || 'auto'}`,
+							}"
 						/>
 						<i
 							v-if="x.item.icon"
@@ -58,9 +66,9 @@
 								color:
 									x.valueTrigger(x.item.type) == 'header'
 										? thisForeground
-										: '',
+										: x.item.color,
 							}"
-							style="flex: 1"
+							style="flex: 1; font-size: 12px"
 						>
 							{{ x.valueTrigger(x.item.name) }}
 						</p>
@@ -73,7 +81,7 @@
 			@click="
 				editor.storage.defaultStorage.mentionItemTools.mentionClickCallback(
 					node.attrs.currentItem,
-					node.attrs.value
+					node.attrs.value,
 				)
 			"
 		>
@@ -84,13 +92,14 @@
 				"
 				class="power-editor-mention-icon"
 			>
-				@
+				<i class="ms-Icon ms-Icon--Accounts"></i>
 			</p>
 			<img
 				v-if="node.attrs.currentItem.image"
 				:src="valueTrigger(node.attrs.currentItem.image)"
 				alt=""
-				class="power-editor-mention-icon"
+				class="power-editor-mention-rendered-img"
+				style="height: 15px"
 			/>
 			<i
 				v-if="node.attrs.currentItem.icon"
@@ -114,6 +123,7 @@
 				:style="{ color: node.attrs.currentItem.color }"
 				@keydown.backspace="delRecover"
 				@keydown.tab="skipNode"
+				@keydown="closeWithLeftRight($event)"
 			/>
 			<p
 				:title="node.attrs.value"
@@ -132,6 +142,7 @@
 <script>
 import { NodeViewWrapper } from "@tiptap/vue-3";
 import onecolor from "onecolor";
+import { TextSelection } from "prosemirror-state";
 
 export default {
 	components: {
@@ -259,7 +270,7 @@ export default {
 			if (!this.node.attrs.freeze) {
 				this.show();
 				this.$refs.target.focus();
-				this.$refs.list.focus = true;
+				this.$refs.list.setFocus();
 			}
 		}, 300);
 		this.getFilterItems();
@@ -273,7 +284,7 @@ export default {
 			window.addEventListener("scroll", this.showPos);
 			this.editor.storage.defaultStorage.editorContainer.addEventListener(
 				"scroll",
-				this.showPos
+				this.showPos,
 			);
 		},
 		showPos() {
@@ -300,13 +311,13 @@ export default {
 			// provide value as a parameter to filter the mentionList.
 			let mentionList =
 				await this.editor.storage.defaultStorage.mentionItemTools.mentionList(
-					this.node.attrs.value
+					this.node.attrs.value,
 				);
 			for (let el of mentionList) {
 				if (
 					await this.editor.storage.defaultStorage.mentionItemTools.filterFunc(
 						el,
-						this.node.attrs.value
+						this.node.attrs.value,
 					)
 				) {
 					result.push(el);
@@ -323,7 +334,7 @@ export default {
 			});
 			this.editor.storage.defaultStorage.mentionItemTools.chooseItemCallback(
 				event.item,
-				this.node.attrs.value
+				this.node.attrs.value,
 			);
 			this.close();
 		},
@@ -344,8 +355,41 @@ export default {
 		},
 		close() {
 			this.showPopper = false;
-			this.$refs.list.focus = false;
+			this.$refs.list.setBlur();
 			this.editor.commands.focus();
+		},
+		closeWithoutSelection() {
+			this.close();
+			const { tr } = this.editor.view.state;
+			let selection = null;
+			if (this.$refs.target.selectionEnd === 0)
+				selection = TextSelection.near(tr.doc.resolve(this.getPos()));
+			else
+				selection = TextSelection.near(
+					tr.doc.resolve(this.getPos() + this.node.nodeSize - 1),
+				);
+			tr.setSelection(selection);
+			this.editor.view.dispatch(tr);
+			this.updateAttributes({
+				freeze: true,
+			});
+		},
+		closeWithLeftRight(event) {
+			let startPos = this.$refs.target.selectionStart;
+			let endPos = this.$refs.target.selectionEnd;
+			if (startPos !== endPos) {
+				return;
+			}
+			if (event.key === "ArrowLeft") {
+				if (startPos === 0) {
+					this.closeWithoutSelection();
+				}
+			}
+			if (event.key === "ArrowRight") {
+				if (startPos === this.$refs.target.value.length) {
+					this.closeWithoutSelection();
+				}
+			}
 		},
 	},
 	beforeUnmount() {
@@ -353,7 +397,7 @@ export default {
 		window.removeEventListener("scroll", this.showPos);
 		this.editor.storage.defaultStorage.editorContainer.removeEventListener(
 			"scroll",
-			this.showPos
+			this.showPos,
 		);
 	},
 };
@@ -367,7 +411,7 @@ export default {
 	padding: 0px 3px 0px 3px;
 	background: rgba(250, 250, 250, 1);
 	font-size: 16px;
-	border-radius: 5px;
+	border-radius: 6px;
 	transition: background-color 0.3s;
 	box-sizing: border-box;
 	display: inline-flex;
@@ -377,6 +421,10 @@ export default {
 	--selected-bg: rgba(45, 170, 219, 0.2);
 	--selected-bg-hover: rgba(45, 170, 219, 0.3);
 	--selected-bg-active: rgba(45, 170, 219, 0.4);
+
+	&.showing {
+		z-index: 3;
+	}
 
 	&.selected {
 		background: var(--selected-bg, rgba(45, 170, 219, 0.2));
@@ -422,17 +470,16 @@ export default {
 		position: fixed;
 		left: 0px;
 		top: 100%;
-		width: 260px;
-		height: 300px;
+		width: 280px;
+		height: 360px;
 		background: rgba(255, 255, 255, 1);
 		border: rgba(50, 49, 48, 0.1) solid thin;
-		border-radius: 6px;
+		border-radius: 12px;
 		box-sizing: border-box;
 		display: flex;
 		align-items: center;
 		flex-direction: column;
-		box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.1),
-			8px 6px 20px rgba(0, 0, 0, 0.1);
+		box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
 		z-index: 1;
 
 		.power-editor-mention-popper-list-loading-block {
@@ -450,6 +497,20 @@ export default {
 			height: 100%;
 			flex: 1;
 			border-radius: 6px;
+
+			.power-editor-mention-img {
+				width: auto;
+				height: 20px;
+				max-height: 20px;
+				margin-right: 15px;
+				object-fit: contain;
+
+				&.avatar {
+					width: 30px;
+					max-width: 30px;
+					border-radius: 50%;
+				}
+			}
 		}
 	}
 
@@ -466,13 +527,25 @@ export default {
 
 		.power-editor-mention-icon {
 			width: 20px;
-			height: 100%;
+			height: 20px;
 			margin: 0px 2px 0px 3px;
 			font-size: 13px;
 			text-align: center;
 			object-fit: contain;
-			display: flex;
+			display: inline-flex;
 			align-items: center;
+			overflow: hidden;
+		}
+
+		.power-editor-mention-rendered-img {
+			width: 20px;
+			height: 20px;
+			margin: 0px 2px 0px 3px;
+			font-size: 13px;
+			text-align: center;
+			object-fit: contain;
+			display: inline-block;
+			overflow: hidden;
 		}
 
 		.power-editor-mention-input {
@@ -520,7 +593,9 @@ export default {
 	}
 
 	.power-editor-mention-popper-fade-enter-active {
-		transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+		transition:
+			opacity 0.1s ease-out,
+			transform 0.1s ease-out;
 		transform-origin: 50% 0%;
 	}
 

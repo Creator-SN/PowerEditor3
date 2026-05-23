@@ -10,7 +10,7 @@
 			:position="'bottomCenter'"
 			:disabled="mobileMode"
 			:beak="12"
-			:space="0"
+			:space="8"
 			:theme="theme"
 			effect="click"
 			:popperClass="[
@@ -23,6 +23,7 @@
 						? 'rgba(56, 56, 56, 1)'
 						: 'rgba(250, 250, 250, 1)',
 			}"
+			:border-radius="12"
 		>
 			<slot name="trigger" :show="false"></slot>
 			<template v-slot:header>
@@ -48,24 +49,32 @@
 						? 'rgba(56, 56, 56, 0.9)'
 						: 'rgba(252, 252, 252, 0.9)'
 				"
+                control-padding="0px 12px"
+                contentPadding="0px 15px"
 				:appendBody="true"
 				:z-index="20"
 			>
-				<div class="p-e-c-b-m-banner">
-					<slot name="header" :title="title">
-						<p style="width: 50px"></p>
-						<p class="p-e-c-b-m-title">{{ title }}</p>
-					</slot>
-					<p
-						class="p-e-c-b-m-close"
-						:style="{
-							color: theme === 'dark' ? 'whitesmoke' : foreground,
-						}"
-						@click="thisShow = false"
-					>
-						{{ getTitle("Cancel") }}
-					</p>
-				</div>
+				<template #header>
+					<div class="p-e-c-b-m-banner">
+						<slot name="header" :title="title">
+							<p style="width: 50px"></p>
+							<p class="p-e-c-b-m-title">{{ title }}</p>
+						</slot>
+						<p
+							class="p-e-c-b-m-close"
+							:style="{
+								color:
+									theme === 'dark'
+										? 'whitesmoke'
+										: foreground,
+							}"
+							@click="thisShow = false"
+						>
+							{{ getTitle("Cancel") }}
+						</p>
+					</div>
+				</template>
+
 				<div class="p-e-c-b-m-content-block" :class="popperClass">
 					<div class="main" style="width: 100%; height: 100%">
 						<slot name="content" index="2"></slot>
@@ -221,13 +230,15 @@ export default {
 		align-items: center;
 
 		.p-e-c-b-m-title {
-			font-size: 16px;
+			font-size: 13.8px;
+            font-weight: bold;
 			user-select: none;
 		}
 
 		.p-e-c-b-m-close {
 			width: 60px;
 			color: rgba(0, 90, 158, 1);
+            font-size: 12px;
 			text-align: center;
 			user-select: none;
 			cursor: pointer;
@@ -239,7 +250,6 @@ export default {
 		width: 100%;
 		height: 100%;
 		flex: 1;
-		padding: 30px 15px;
 		box-sizing: border-box;
 		display: flex;
 		justify-content: center;

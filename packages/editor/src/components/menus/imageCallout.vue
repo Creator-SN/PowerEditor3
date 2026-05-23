@@ -42,6 +42,7 @@
                     :placeholder="getTitle('Insert Image Url.')"
                     :theme="theme"
                     underline
+                    icon="Link"
                     :border-width="2"
                     :is-box-shadow="true"
                     :border-color="'rgba(200, 200, 200, 0.1)'"
@@ -56,6 +57,7 @@
                     theme="dark"
                     :disabled="url === ''"
                     :background="foreground"
+                    border-radius="6"
                     :is-box-shadow="true"
                     style="width: 150px;"
                     @click="insert"
