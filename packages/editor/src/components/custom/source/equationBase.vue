@@ -70,7 +70,7 @@
 <script>
 import onecolor from "onecolor";
 import { NodeViewWrapper } from "@tiptap/vue-3";
-import { TextSelection } from "@tiptap/pm/state";
+import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 
 import katex from "katex";
 import "@/packages/editor/src/styles/katex.scss";
@@ -178,7 +178,7 @@ export default {
 			this.thisForeground = val;
 		},
 		selected(val) {
-			if (val) this.show();
+			if (val && this.isCurrentNodeSelection()) this.show();
 		},
 	},
 	computed: {
@@ -251,6 +251,13 @@ export default {
 			setTimeout(() => {
 				if (this.$refs.input) this.$refs.input.focus();
 			}, 300);
+		},
+		isCurrentNodeSelection() {
+			const { selection } = this.editor.state;
+			return (
+				selection instanceof NodeSelection &&
+				selection.from === this.getPos()
+			);
 		},
 		close(confirm = true) {
 			this.showPopper = false;
