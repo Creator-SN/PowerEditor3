@@ -16,7 +16,7 @@ export default Node.create({
                 default: [],
             },
             width: {
-                default: 100,
+                default: '100%',
             },
             caption: {
                 default: '',

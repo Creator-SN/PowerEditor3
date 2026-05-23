@@ -2,7 +2,7 @@
 	<div
 		class="power-editor-media-container"
 		:class="[{ dark: theme === 'dark' }, { 'active-effects': active }]"
-		:style="{ width: moveable ? `${elWidthEnd}px` : `${currentWidth}%` }"
+		:style="{ width: moveable ? `${elWidthEnd}px` : normalizeWidthValue(currentWidth) }"
 	>
 		<div
 			v-show="
@@ -63,8 +63,9 @@
 				:background="
 					theme === 'dark'
 						? 'rgba(0, 0, 0, 0.8)'
-						: 'rgba(255, 255, 255, 0.3)'
+						: 'rgba(255, 255, 255, 0.0)'
 				"
+                :border-radius="6"
 				:theme="theme"
 				fontSize="10"
 				:title="getTitle('Caption')"
@@ -77,8 +78,9 @@
 				:background="
 					theme === 'dark'
 						? 'rgba(0, 0, 0, 0.8)'
-						: 'rgba(255, 255, 255, 0.3)'
+						: 'rgba(255, 255, 255, 0.0)'
 				"
+                :border-radius="6"
 				:theme="theme"
 				fontSize="10"
 				:title="getTitle('AlignLeft')"
@@ -91,8 +93,9 @@
 				:background="
 					theme === 'dark'
 						? 'rgba(0, 0, 0, 0.8)'
-						: 'rgba(255, 255, 255, 0.3)'
+						: 'rgba(255, 255, 255, 0.0)'
 				"
+                :border-radius="6"
 				:theme="theme"
 				fontSize="10"
 				:title="getTitle('AlignCenter')"
@@ -110,8 +113,9 @@
 				:background="
 					theme === 'dark'
 						? 'rgba(0, 0, 0, 0.8)'
-						: 'rgba(255, 255, 255, 0.3)'
+						: 'rgba(255, 255, 255, 0.0)'
 				"
+                :border-radius="6"
 				:theme="theme"
 				icon="ReturnKeySm"
 				fontSize="10"
@@ -198,12 +202,11 @@ export default {
 			thisAlignCenter: this.alignCenter,
 			elWidthStart: 0,
 			elWidthEnd: 0,
-			ppi: 0,
 			active: false,
 			moveable: false,
 			direction: 1,
 			disX: 0,
-			currentWidth: this.width,
+			currentWidth: this.normalizeWidthValue(this.width),
 			outsideEvent: (event) => {
 				let x = event.target;
 				let _self = false;
@@ -223,7 +226,7 @@ export default {
 	},
 	watch: {
 		width(val) {
-			this.currentWidth = val;
+			this.currentWidth = this.normalizeWidthValue(val);
 		},
 		currentWidth(val) {
 			this.$emit("update:width", val);
@@ -286,19 +289,34 @@ export default {
 			this.direction = direction;
 			this.elWidthStart = this.$el.clientWidth;
 			this.elWidthEnd = this.elWidthStart;
-			this.ppi =
-				(this.currentWidth > 100 ? 100 : this.currentWidth) /
-				this.elWidthStart;
 		},
 		stop() {
 			this.active = false;
 			this.moveable = false;
 			if (this.elWidthEnd < 50) this.elWidthEnd = 50;
-			this.currentWidth = this.elWidthEnd * this.ppi;
-			if (this.currentWidth > 100) this.currentWidth = 100;
+			this.currentWidth = `${this.elWidthEnd}px`;
 		},
 		outSideClickInit() {
 			window.addEventListener("click", this.outsideEvent);
+		},
+		normalizeWidthValue(width) {
+			const normalizedWidth = width?.toString().trim();
+
+			if (!normalizedWidth) return "100%";
+			if (
+				normalizedWidth.includes("%") ||
+				normalizedWidth.includes("px") ||
+				normalizedWidth.includes("vw") ||
+				normalizedWidth.includes("vh") ||
+				normalizedWidth.includes("rem") ||
+				normalizedWidth.includes("em") ||
+				normalizedWidth.includes("auto") ||
+				normalizedWidth.includes("calc(")
+			) {
+				return normalizedWidth;
+			}
+
+			return `${normalizedWidth}%`;
 		},
 		getTitle(name) {
 			return i18n(name, this.editor.storage.defaultStorage.language);
