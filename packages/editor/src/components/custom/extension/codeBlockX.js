@@ -38,11 +38,43 @@ function readCodeText(element) {
         return "";
     }
 
-    const text = typeof element.innerText === "string"
-        ? element.innerText
-        : element.textContent || "";
+    const pieces = [];
+    const blockTags = new Set(["DIV", "P"]);
 
-    return text.replace(/\r\n?/g, "\n");
+    const walk = (node) => {
+        if (!node) {
+            return;
+        }
+
+        if (node.nodeType === Node.TEXT_NODE) {
+            pieces.push(node.nodeValue || "");
+            return;
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+            return;
+        }
+
+        if (node.tagName === "BR") {
+            pieces.push("\n");
+            return;
+        }
+
+        const startLength = pieces.length;
+        Array.from(node.childNodes).forEach(walk);
+
+        if (
+            blockTags.has(node.tagName) &&
+            pieces.length > startLength &&
+            pieces[pieces.length - 1] !== "\n"
+        ) {
+            pieces.push("\n");
+        }
+    };
+
+    walk(element);
+
+    return pieces.join("").replace(/\r\n?/g, "\n").replace(/\n$/, "");
 }
 
 export default CodeBlockLowlight.extend({
