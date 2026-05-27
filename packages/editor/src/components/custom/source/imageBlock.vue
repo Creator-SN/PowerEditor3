@@ -16,6 +16,7 @@
 			:foreground="thisForeground"
 			:node="node"
 			:getPos="getPos"
+			ref="mediaContainer"
 			@update:caption="updateAttributes({ caption: $event })"
 			@container-dblclick="preview('editable')"
 			@container-click="preview('readonly')"
@@ -240,13 +241,18 @@ export default {
 	},
 	computed: {
 		displayHeight() {
-			if (this.imgStatus === "error")
+			if (this.imgStatus === "init" || this.imgStatus === "error") {
+				if (this.statusInfo.tmpHeight <= 0) {
+					const ratio =
+						(this.node.attrs.naturalWidth || 0) /
+						(this.node.attrs.naturalHeight || 0.000001);
+					return (
+						(this.$refs.mediaContainer?.$el?.clientWidth || 0) /
+							ratio +
+						"px"
+					);
+				}
 				return this.statusInfo.tmpHeight + "px";
-			if (this.imgStatus === "init") {
-				const ratio =
-					(this.node.attrs.naturalWidth || 0) /
-					(this.node.attrs.naturalHeight || 0.000001);
-				return (this.$el?.clientWidth || 0) / ratio + "px";
 			}
 			return "";
 		},
