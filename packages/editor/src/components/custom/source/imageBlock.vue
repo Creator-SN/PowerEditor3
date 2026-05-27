@@ -32,10 +32,7 @@
 				:onlazy="thisLazyLoad"
 				style="width: 100%; height: auto"
 				:style="{
-					height:
-						imgStatus === 'error'
-							? statusInfo.tmpHeight + 'px'
-							: '',
+					height: displayHeight,
 				}"
 				@load="imgLoaded"
 				@error="imgError"
@@ -241,6 +238,19 @@ export default {
 			this.imgInterceptorFunc();
 		},
 	},
+	computed: {
+		displayHeight() {
+			if (this.imgStatus === "error")
+				return this.statusInfo.tmpHeight + "px";
+			if (this.imgStatus === "init") {
+				const ratio =
+					(this.node.attrs.naturalWidth || 0) /
+					(this.node.attrs.naturalHeight || 0.000001);
+				return (this.$el?.clientWidth || 0) / ratio + "px";
+			}
+			return "";
+		},
+	},
 	mounted() {
 		this.imgInterceptorFunc();
 	},
@@ -295,6 +305,10 @@ export default {
 			const ratio = (naturalWidth || 0) / (naturalHeight || 0.000001);
 			this.statusInfo.tmpHeight = width / ratio;
 			this.imgStatus = "loaded";
+			this.updateAttributes({
+				naturalWidth,
+				naturalHeight,
+			});
 		},
 		imgError() {
 			this.imgStatus = "error";
