@@ -1,6 +1,6 @@
 # MentionItem
 
-`MentionItem` configures mention behavior inside the editor, such as `@user`, `#topic`, or custom business entities. Pass `mentionItemAttr` to `PowerEditor` to define candidates, filtering logic, selection callbacks, and click callbacks.
+`MentionItem` configures mention behavior inside the editor, such as `@user`, `#topic`, or custom business entities. Pass `mentionItemAttr` to `PowerEditor` to define candidates, filtering logic, loading state, selection callbacks, and click callbacks.
 
 <script setup>
 import { ref } from "vue";
@@ -8,6 +8,7 @@ import { useData } from "vitepress";
 
 const viteData = useData();
 const mentionLog = ref("Type @ in the editor below, then select a mention item.");
+const remoteLoading = ref(false);
 
 const mentionList = [
     { key: 0, name: "Mention Color", type: "header" },
@@ -25,15 +26,40 @@ const mentionList = [
         icon: "DelveAnalyticsLogo",
         iconColor: "#958DF1",
     },
-    { key: 3, name: "Mention Text", type: "header" },
+    { key: 3, name: "AI Models", type: "header" },
     { key: 9, name: "", type: "divider" },
-    { key: 5, name: "Deepseek", image: "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/deepseek.svg" },
-    { key: 6, name: "OpenAI", image: "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/openai.svg" },
+    {
+        key: 5,
+        name: "DeepSeek",
+        image: "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/deepseek.svg",
+        imageWidth: "18px",
+    },
+    {
+        key: 6,
+        name: "OpenAI",
+        image: "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/openai.svg",
+        imageWidth: "18px",
+    },
+    {
+        key: 7,
+        name: "Alever",
+        color: "#2563eb",
+        image: "https://api.dicebear.com/9.x/initials/svg?seed=Alever",
+        avatarImg: true,
+    },
 ];
 
 const mentionItemAttr = {
-    mentionList: () => mentionList,
-    filterFunc: (listItem, value) => {
+    mentionList: async (value, oldValue) => {
+        remoteLoading.value = true;
+
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        remoteLoading.value = false;
+        mentionLog.value = `mentionList(value: ${value || "empty"}, oldValue: ${oldValue || "empty"})`;
+        return mentionList;
+    },
+    filterFunc: (listItem, value, oldValue) => {
         if (listItem.type === "header" || listItem.type === "divider") {
             return true;
         }
@@ -42,14 +68,16 @@ const mentionItemAttr = {
             return true;
         }
 
+        mentionLog.value = `filterFunc(value: ${value}, oldValue: ${oldValue || "empty"})`;
         return listItem.name.toLowerCase().includes(value.toLowerCase());
     },
     chooseItemCallback: (chooseItem, value) => {
         mentionLog.value = `Selected: ${chooseItem.name} (input: ${value || "empty"})`;
     },
-    mentionClickCallback: (chooseItem) => {
-        mentionLog.value = `Clicked mention: ${chooseItem.name}`;
+    mentionClickCallback: (chooseItem, value) => {
+        mentionLog.value = `Clicked mention: ${chooseItem.name} (text value: ${value || "empty"})`;
     },
+    isLoading: () => remoteLoading.value,
     headerForeground: () => "#958DF1",
 };
 </script>
@@ -65,54 +93,142 @@ Type `@` in the editor below to see the mention list attached directly to `power
 
 <p>{{ mentionLog }}</p>
 
-## Props
+## mentionItemAttr Options
 
-| Prop | Type | Required | Default | Description |
+| Option | Type | Required | Default | Description |
 | :-- | :-- | :--: | :-- | :-- |
-| `value` | `string` | No | - | Current input value. |
-| `placeholder` | `string` | No | `Write something...` | Placeholder text. |
-| `mentionList` | `array \| function` | No | `[]` | Candidate list, or a function that returns candidates. |
-| `filterFunc` | `function` | No | - | Custom candidate filter. |
-| `chooseItemCallback` | `function` | No | - | Called after a candidate is selected. |
-| `mentionClickCallback` | `function` | No | - | Called when an inserted mention is clicked. |
-| `headerForeground` | `string \| function` | No | `rgba(0, 120, 212, 1)` | Popper header foreground color. |
-| `showPopper` | `boolean` | No | `false` | Whether to show the candidate popper. |
-| `theme` | `'light' \| 'dark'` | No | `light` | Theme. |
+| `mentionList` | `array \| (value, oldValue) => array \| Promise<array>` | No | `[]` | Returns the candidate list. Supports sync and async usage. The current implementation passes the latest input `value` and previous input `oldValue`. |
+| `filterFunc` | `(listItem, value, oldValue) => boolean \| Promise<boolean>` | No | `() => true` | Applies a second-pass filter to every item returned by `mentionList`. Supports sync and async usage. Usually keeps structural items like `header` and `divider`, while filtering regular entries by text or keywords. |
+| `chooseItemCallback` | `(chooseItem, value) => void` | No | `() => console.log(...)` | Called after a candidate is selected. `chooseItem` is the final selected object and `value` is the current input text. |
+| `mentionClickCallback` | `(chooseItem, value) => void` | No | `() => console.log(...)` | Called when the user clicks a mention node that has already been inserted into the editor. |
+| `isLoading` | `() => boolean` | No | `() => true` | Controls whether the loading bar at the top of the mention popper is visible. Usually used together with an async `mentionList`. The component also combines it with its internal request `loading` state. |
+| `headerForeground` | `string \| () => string` | No | `() => this.foreground` | Foreground color used by `header` items. |
 
-## Configure In PowerEditor
+## Candidate Item Shape
 
-`mentionList`, `filterFunc`, `chooseItemCallback`, `mentionClickCallback`, and `headerForeground` are usually passed through `mentionItemAttr` when `PowerEditor` is initialized.
+`mentionList` returns an array, and each object in that array represents one candidate item. Common fields are:
+
+| Field | Type | Required | Description |
+| :-- | :-- | :--: | :-- |
+| `key` | `string \| number` | Recommended | Unique identifier for the item. It is recommended to always provide one. |
+| `name` | `string \| () => string` | Yes | Display text in the list. It is also used as the default inserted value after selection. |
+| `type` | `string \| () => string` | No | Special item type. Common values are `header` and `divider`. `header` uses `headerForeground`, and `divider` is typically used only for grouping. |
+| `color` | `string` | No | Mention text color. |
+| `icon` | `string \| () => string` | No | Fluent UI icon name, such as `WindowsLogo`. |
+| `iconColor` | `string \| () => string` | No | Icon color. |
+| `image` | `string \| () => string` | No | Image URL shown on the left side of the candidate item. It is also used when rendering the selected mention. |
+| `imageWidth` | `string` | No | Width of the list image, such as `18px` or `24px`. The default layout is used when omitted. |
+| `avatarImg` | `boolean \| () => boolean` | No | When `true`, the list `image` is rendered as a circular avatar. |
+
+Additional notes:
+
+- `name`, `type`, `icon`, `iconColor`, `image`, and `avatarImg` can be provided as plain values or functions. The component resolves those functions during rendering.
+- After selection, the entire `chooseItem` object is stored on the node, so `mentionClickCallback` receives the same object when the mention is clicked later.
+- `divider` items are meant for structure only and should generally not carry business logic.
+
+## Function Parameters
+
+### mentionList(value, oldValue)
+
+- `value`: latest text in the input.
+- `oldValue`: previous text before the latest change.
+
+Typical use cases:
+
+- Local static data: return an array directly.
+- Remote search: request data based on `value` and return the result.
+- Incremental search: compare `value` and `oldValue` to decide whether to search again, reuse cache, or return a previous result.
 
 ```vue
-<script setup>
 const mentionItemAttr = {
-    mentionList: () => [
-        { key: 0, name: "Mention Color", type: "header" },
-        {
-            key: 1,
-            name: "Blue",
-            color: "rgba(0, 120, 212, 1)",
-            icon: "WindowsLogo",
-            iconColor: "rgba(0, 153, 204, 1)",
-        },
-        {
-            key: 2,
-            name: "Purple",
-            color: "#958DF1",
-            icon: "DelveAnalyticsLogo",
-            iconColor: "#958DF1",
-        },
-        { key: 3, name: "Mention Text", type: "header" },
-        { key: 9, name: "", type: "divider" },
-        { key: 5, name: "Text1" },
-        { key: 6, name: "Text2" },
-    ],
-    filterFunc: (listItem, value) => {
+    mentionList: async (value, oldValue) => {
+        console.log("mentionList", { value, oldValue });
+        return await fetchUsers(value);
+    },
+};
+```
+
+### filterFunc(listItem, value, oldValue)
+
+- `listItem`: the candidate item currently being evaluated.
+- `value`: latest text in the input.
+- `oldValue`: previous text before the latest change.
+
+Typical use cases:
+
+- Always keep structural items such as `header` and `divider`.
+- Apply local fuzzy matching to static candidates.
+- Run a second pass over results from `mentionList` without triggering another remote request.
+
+```vue
+const mentionItemAttr = {
+    filterFunc: (listItem, value, oldValue) => {
         if (listItem.type === "header" || listItem.type === "divider") {
             return true;
         }
 
-        return listItem.name.toLowerCase().includes(value.toLowerCase());
+        console.log("filterFunc", { value, oldValue, listItem });
+        return listItem.name.toLowerCase().includes((value || "").toLowerCase());
+    },
+};
+```
+
+## Configure In PowerEditor
+
+```vue
+<script setup>
+import { ref } from "vue";
+
+const loading = ref(false);
+
+const mentionItemAttr = {
+    mentionList: async (value, oldValue) => {
+        loading.value = true;
+
+        const items = [
+            { key: 0, name: "Mention Color", type: "header" },
+            {
+                key: 1,
+                name: "Blue",
+                color: "rgba(0, 120, 212, 1)",
+                icon: "WindowsLogo",
+                iconColor: "rgba(0, 153, 204, 1)",
+            },
+            {
+                key: 2,
+                name: "Purple",
+                color: "#958DF1",
+                icon: "DelveAnalyticsLogo",
+                iconColor: "#958DF1",
+            },
+            { key: 3, name: "Teams", type: "header" },
+            { key: 9, name: "", type: "divider" },
+            {
+                key: 5,
+                name: "Power Editor",
+                image: "https://api.dicebear.com/9.x/shapes/svg?seed=PowerEditor",
+                imageWidth: "20px",
+            },
+            {
+                key: 6,
+                name: "Alever",
+                image: "https://api.dicebear.com/9.x/initials/svg?seed=Alever",
+                avatarImg: true,
+                color: "#2563eb",
+            },
+        ];
+
+        loading.value = false;
+        console.log("mentionList", value, oldValue);
+        return items;
+    },
+    filterFunc: (listItem, value, oldValue) => {
+        if (listItem.type === "header" || listItem.type === "divider") {
+            return true;
+        }
+
+        console.log("filterFunc", value, oldValue);
+        return listItem.name.toLowerCase().includes((value || "").toLowerCase());
     },
     chooseItemCallback: (chooseItem, value) => {
         console.log("chooseItemCallback", chooseItem, value);
@@ -120,6 +236,7 @@ const mentionItemAttr = {
     mentionClickCallback: (chooseItem, value) => {
         console.log("mentionClickCallback", chooseItem, value);
     },
+    isLoading: () => loading.value,
     headerForeground: () => "#0078d4",
 };
 </script>
@@ -129,8 +246,9 @@ const mentionItemAttr = {
 </template>
 ```
 
-## Callback Notes
+## Usage Notes
 
-`filterFunc` should stay lightweight and focused on filtering. If remote search is needed, load data in `mentionList` or cache candidate data in advance.
-
-`chooseItemCallback` is a good place to record selection behavior, enrich business fields, or trigger follow-up actions. `mentionClickCallback` is better suited for opening detail cards, navigation, or inspecting related entities.
+- `mentionList` is the best place for fetching, caching, and remote search.
+- `filterFunc` should stay lightweight and focus on client-side filtering.
+- If your candidates come from an API, keep the loading state outside the component and expose it through `isLoading`.
+- For avatar-style list items, provide `image` and set `avatarImg` to `true`.

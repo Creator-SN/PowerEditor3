@@ -21,7 +21,7 @@
 				:style="{ left: `${left}px`, top: `${top}px` }"
 			>
 				<div
-					v-show="loading"
+					v-show="loading || isLoading()"
 					class="power-editor-mention-popper-list-loading-block"
 				>
 					<fv-progressRing
@@ -47,7 +47,7 @@
 						<img
 							v-if="x.item.image"
 							class="power-editor-mention-img"
-							:class="[{ avatar: x.item.avatarImg }]"
+							:class="[{ avatar: valueTrigger(x.item.avatarImg) }]"
 							:src="x.valueTrigger(x.item.image)"
 							alt=""
 							:style="{
@@ -222,9 +222,9 @@ export default {
 				});
 			}
 		},
-		"node.attrs.value"() {
+		"node.attrs.value"(newVal, oldVal) {
 			this.delRecover();
-			this.getFilterItems();
+			this.getFilterItems(newVal, oldVal);
 		},
 		"editor.storage.defaultStorage.theme"(val) {
 			this.thisTheme = val;
@@ -273,7 +273,7 @@ export default {
 				this.$refs.list.setFocus();
 			}
 		}, 300);
-		this.getFilterItems();
+		this.getFilterItems(this.node.attrs.value, "");
 	},
 
 	methods: {
@@ -305,19 +305,21 @@ export default {
 				this.$refs.target.focus();
 			}, 300);
 		},
-		async getFilterItems() {
+		async getFilterItems(newVal, oldVal) {
 			this.loading = true;
 			let result = [];
 			// provide value as a parameter to filter the mentionList.
 			let mentionList =
 				await this.editor.storage.defaultStorage.mentionItemTools.mentionList(
-					this.node.attrs.value,
+					newVal,
+					oldVal,
 				);
 			for (let el of mentionList) {
 				if (
 					await this.editor.storage.defaultStorage.mentionItemTools.filterFunc(
 						el,
-						this.node.attrs.value,
+						newVal,
+						oldVal,
 					)
 				) {
 					result.push(el);
@@ -337,6 +339,9 @@ export default {
 				this.node.attrs.value,
 			);
 			this.close();
+		},
+		isLoading() {
+			return this.editor.storage.defaultStorage.mentionItemTools?.isLoading() || false;
 		},
 		valueTrigger(val) {
 			if (typeof val === "function") return val();

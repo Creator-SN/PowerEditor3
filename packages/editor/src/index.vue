@@ -541,6 +541,9 @@ export default {
 				mentionClickCallback: () => {
 					console.log("mentionClickCallback");
 				},
+				isLoading: () => {
+					return false;
+				},
 				headerForeground: () => {
 					return this.foreground;
 				},
