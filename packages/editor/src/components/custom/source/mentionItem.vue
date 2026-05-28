@@ -120,7 +120,7 @@
 				v-show="!node.attrs.freeze"
 				v-model="node.attrs.value"
 				class="power-editor-mention-input"
-				:placeholder="node.attrs.placeholder"
+				:placeholder="thisPlaceholder"
 				:class="[{ freeze: node.attrs.freeze }]"
 				:readonly="node.attrs.freeze"
 				ref="target"
@@ -136,9 +136,7 @@
 				:class="[{ show: node.attrs.freeze }]"
 				:style="{ color: node.attrs.currentItem.color }"
 			>
-				{{
-					node.attrs.value ? node.attrs.value : node.attrs.placeholder
-				}}
+				{{ node.attrs.value ? node.attrs.value : thisPlaceholder }}
 			</p>
 		</span>
 	</node-view-wrapper>
@@ -220,6 +218,13 @@ export default {
 		};
 	},
 	watch: {
+		thisPlaceholder(val) {
+			if (val !== this.node.attrs.placeholder) {
+				this.updateAttributes({
+					placeholder: val,
+				});
+			}
+		},
 		showPopper(val) {
 			if (val) {
 				this.$nextTick(() => {
@@ -267,10 +272,24 @@ export default {
 				return "";
 			}
 		},
+		thisPlaceholder() {
+			const placeholder =
+				this.editor.storage.defaultStorage.mentionItemTools?.placeholder?.(
+					this.node.attrs.currentItem,
+					this.node.attrs.value,
+				);
+
+			return placeholder || this.node.attrs.placeholder;
+		},
 	},
 	mounted() {
 		this.outSideClickInit();
 		this.windowEventInit();
+		if (this.thisPlaceholder !== this.node.attrs.placeholder) {
+			this.updateAttributes({
+				placeholder: this.thisPlaceholder,
+			});
+		}
 		setTimeout(() => {
 			if (!this.node.attrs.freeze) {
 				this.show();

@@ -77,6 +77,13 @@ const mentionItemAttr = {
     mentionClickCallback: (chooseItem, value) => {
         mentionLog.value = `Clicked mention: ${chooseItem.name} (text value: ${value || "empty"})`;
     },
+    placeholder: (currentItem, value) => {
+        if (currentItem?.name) {
+            return `Type for ${currentItem.name}`;
+        }
+
+        return value ? "Keep typing to search" : "Type to search mentions";
+    },
     isLoading: () => remoteLoading.value,
     headerForeground: () => "#958DF1",
 };
@@ -101,6 +108,7 @@ Type `@` in the editor below to see the mention list attached directly to `power
 | `filterFunc` | `(listItem, value, oldValue) => boolean \| Promise<boolean>` | No | `() => true` | Applies a second-pass filter to every item returned by `mentionList`. Supports sync and async usage. Usually keeps structural items like `header` and `divider`, while filtering regular entries by text or keywords. |
 | `chooseItemCallback` | `(chooseItem, value) => void` | No | `() => console.log(...)` | Called after a candidate is selected. `chooseItem` is the final selected object and `value` is the current input text. |
 | `mentionClickCallback` | `(chooseItem, value) => void` | No | `() => console.log(...)` | Called when the user clicks a mention node that has already been inserted into the editor. |
+| `placeholder` | `(currentItem, value) => string` | No | `() => "mention"` | Returns the input placeholder dynamically. The component also syncs the result back to the node's `placeholder` attribute. |
 | `isLoading` | `() => boolean` | No | `() => true` | Controls whether the loading bar at the top of the mention popper is visible. Usually used together with an async `mentionList`. The component also combines it with its internal request `loading` state. |
 | `headerForeground` | `string \| () => string` | No | `() => this.foreground` | Foreground color used by `header` items. |
 
@@ -173,6 +181,29 @@ const mentionItemAttr = {
 };
 ```
 
+### placeholder(currentItem, value)
+
+- `currentItem`: the candidate object currently stored on the node. It is usually an empty object at first, and becomes the selected item after the user picks one.
+- `value`: latest text in the input.
+
+Typical use cases:
+
+- Show different helper text for different mention entity types.
+- Provide clearer guidance before the user starts typing.
+- Switch placeholder text by business context, such as "Type a name to search members" or "Type an ID to search tickets".
+
+```vue
+const mentionItemAttr = {
+    placeholder: (currentItem, value) => {
+        if (currentItem?.name) {
+            return `Type for ${currentItem.name}`;
+        }
+
+        return value ? "Keep typing to search" : "Type to search mentions";
+    },
+};
+```
+
 ## Configure In PowerEditor
 
 ```vue
@@ -236,6 +267,13 @@ const mentionItemAttr = {
     mentionClickCallback: (chooseItem, value) => {
         console.log("mentionClickCallback", chooseItem, value);
     },
+    placeholder: (currentItem, value) => {
+        if (currentItem?.name) {
+            return `Type for ${currentItem.name}`;
+        }
+
+        return value ? "Keep typing to search" : "Type to search members";
+    },
     isLoading: () => loading.value,
     headerForeground: () => "#0078d4",
 };
@@ -250,5 +288,6 @@ const mentionItemAttr = {
 
 - `mentionList` is the best place for fetching, caching, and remote search.
 - `filterFunc` should stay lightweight and focus on client-side filtering.
+- `placeholder` works well when the helper text should react to the current mention type, selected item, or input state.
 - If your candidates come from an API, keep the loading state outside the component and expose it through `isLoading`.
 - For avatar-style list items, provide `image` and set `avatarImg` to `true`.

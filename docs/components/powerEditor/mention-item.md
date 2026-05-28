@@ -77,6 +77,13 @@ const mentionItemAttr = {
     mentionClickCallback: (chooseItem, value) => {
         mentionLog.value = `点击了 mention: ${chooseItem.name} (文本值: ${value || "空"})`;
     },
+    placeholder: (currentItem, value) => {
+        if (currentItem?.name) {
+            return `请输入 ${currentItem.name}`;
+        }
+
+        return value ? "继续输入以搜索" : "输入以搜索 mention";
+    },
     isLoading: () => remoteLoading.value,
     headerForeground: () => "#958DF1",
 };
@@ -101,6 +108,7 @@ const mentionItemAttr = {
 | `filterFunc` | `(listItem, value, oldValue) => boolean \| Promise<boolean>` | 否 | `() => true` | 对 `mentionList` 返回的每一项做二次过滤。支持同步或异步。通常保留 `header`、`divider` 之类结构项，普通项按名称或关键字过滤。 |
 | `chooseItemCallback` | `(chooseItem, value) => void` | 否 | `() => console.log(...)` | 用户选中候选项后触发。`chooseItem` 是最终选中的对象，`value` 是当前输入值。 |
 | `mentionClickCallback` | `(chooseItem, value) => void` | 否 | `() => console.log(...)` | 点击已经插入到编辑器中的 mention 节点时触发。 |
+| `placeholder` | `(currentItem, value) => string` | 否 | `() => "mention"` | 动态返回输入框占位文案。组件会把结果同步回节点的 `placeholder` 属性。 |
 | `isLoading` | `() => boolean` | 否 | `() => true` | 控制候选弹层顶部 loading 条是否显示。通常配合异步 `mentionList` 使用。组件内部请求中的 `loading` 与这个返回值会一起参与显示判断。 |
 | `headerForeground` | `string \| () => string` | 否 | `() => this.foreground` | `header` 类型候选项使用的前景色。 |
 
@@ -173,6 +181,29 @@ const mentionItemAttr = {
 };
 ```
 
+### placeholder(currentItem, value)
+
+- `currentItem`：当前节点里保存的候选项对象，初始时通常是空对象，选中后会变成已选项。
+- `value`：当前输入框里的最新文本。
+
+适用场景：
+
+- 根据当前已选实体动态显示不同提示词。
+- 在用户尚未输入内容时提供更明确的引导文案。
+- 根据业务状态切换占位符，比如“输入姓名搜索成员”或“输入编号搜索工单”。
+
+```vue
+const mentionItemAttr = {
+    placeholder: (currentItem, value) => {
+        if (currentItem?.name) {
+            return `请输入 ${currentItem.name}`;
+        }
+
+        return value ? "继续输入以搜索" : "输入以搜索 mention";
+    },
+};
+```
+
 ## 在 PowerEditor 中配置
 
 ```vue
@@ -236,6 +267,13 @@ const mentionItemAttr = {
     mentionClickCallback: (chooseItem, value) => {
         console.log("mentionClickCallback", chooseItem, value);
     },
+    placeholder: (currentItem, value) => {
+        if (currentItem?.name) {
+            return `请输入 ${currentItem.name}`;
+        }
+
+        return value ? "继续输入以搜索" : "输入以搜索成员";
+    },
     isLoading: () => loading.value,
     headerForeground: () => "#0078d4",
 };
@@ -250,5 +288,6 @@ const mentionItemAttr = {
 
 - `mentionList` 适合处理取数、缓存和远程请求。
 - `filterFunc` 适合处理轻量级前端过滤，尽量不要在这里做重请求。
+- `placeholder` 适合根据当前 mention 类型、已选项或输入状态动态调整提示文案。
 - 如果你的候选项来自接口，建议把 loading 状态单独维护，再通过 `isLoading` 返回给组件。
 - 如果列表项需要头像样式，传 `image` 并把 `avatarImg` 设为 `true` 即可。

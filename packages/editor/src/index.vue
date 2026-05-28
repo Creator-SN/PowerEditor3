@@ -541,6 +541,9 @@ export default {
 				mentionClickCallback: () => {
 					console.log("mentionClickCallback");
 				},
+				placeholder: () => {
+					return "mention";
+				},
 				isLoading: () => {
 					return false;
 				},
