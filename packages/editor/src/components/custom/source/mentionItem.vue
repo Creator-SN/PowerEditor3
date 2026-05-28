@@ -47,7 +47,9 @@
 						<img
 							v-if="x.item.image"
 							class="power-editor-mention-img"
-							:class="[{ avatar: valueTrigger(x.item.avatarImg) }]"
+							:class="[
+								{ avatar: valueTrigger(x.item.avatarImg) },
+							]"
 							:src="x.valueTrigger(x.item.image)"
 							alt=""
 							:style="{
@@ -99,6 +101,9 @@
 				:src="valueTrigger(node.attrs.currentItem.image)"
 				alt=""
 				class="power-editor-mention-rendered-img"
+				:class="[
+					{ avatar: valueTrigger(node.attrs.currentItem.avatarImg) },
+				]"
 				style="height: 15px"
 			/>
 			<i
@@ -341,7 +346,10 @@ export default {
 			this.close();
 		},
 		isLoading() {
-			return this.editor.storage.defaultStorage.mentionItemTools?.isLoading() || false;
+			return (
+				this.editor.storage.defaultStorage.mentionItemTools?.isLoading() ||
+				false
+			);
 		},
 		valueTrigger(val) {
 			if (typeof val === "function") return val();
@@ -552,6 +560,11 @@ export default {
 			object-fit: contain;
 			display: inline-block;
 			overflow: hidden;
+
+			&.avatar {
+                max-width: 20px;
+				border-radius: 50%;
+			}
 		}
 
 		.power-editor-mention-input {
