@@ -28,8 +28,12 @@
 						loading="true"
 						r="10"
 						borderWidth="2"
-						:foreground="thisForeground"
-						background="white"
+						:color="thisForeground"
+						:background="
+							thisTheme === 'dark'
+								? 'rgba(0, 0, 0, 0.3)'
+								: 'rgba(200, 200, 200, 0.3)'
+						"
 					></fv-progressRing>
 				</div>
 				<fv-list-view
