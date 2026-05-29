@@ -1,6 +1,6 @@
 # MentionItem
 
-`MentionItem` configures mention behavior inside the editor, such as `@user`, `#topic`, or custom business entities. Pass `mentionItemAttr` to `PowerEditor` to define candidates, filtering logic, loading state, selection callbacks, and click callbacks.
+`MentionItem` configures mention behavior inside the editor, such as `@user`, `#topic`, or custom business entities. Pass `mentionItemAttr` to `PowerEditor` to define candidates, external search logic, loading state, selection callbacks, and click callbacks.
 
 <script setup>
 import { ref } from "vue";
@@ -10,7 +10,7 @@ const viteData = useData();
 const mentionLog = ref("Type @ in the editor below, then select a mention item.");
 const remoteLoading = ref(false);
 
-const mentionList = [
+const mentionSource = ref([
     { key: 0, name: "Mention Color", type: "header" },
     {
         key: 1,
@@ -47,29 +47,63 @@ const mentionList = [
         image: "https://api.dicebear.com/9.x/initials/svg?seed=Alever",
         avatarImg: true,
     },
-];
+]);
 
 const mentionItemAttr = {
-    mentionList: async (value, oldValue) => {
+    mentionList: () => mentionSource.value,
+    filterFunc: async (value, oldValue) => {
         remoteLoading.value = true;
 
         await new Promise((resolve) => setTimeout(resolve, 150));
 
+        const keyword = (value || "").toLowerCase();
+        mentionSource.value = [
+            { key: 0, name: "Mention Color", type: "header" },
+            {
+                key: 1,
+                name: "Blue",
+                color: "rgba(85, 153, 202, 1)",
+                icon: "WindowsLogo",
+                iconColor: "rgba(85, 153, 202, 1)",
+            },
+            {
+                key: 2,
+                name: "Purple",
+                color: "#958DF1",
+                icon: "DelveAnalyticsLogo",
+                iconColor: "#958DF1",
+            },
+            { key: 3, name: "AI Models", type: "header" },
+            { key: 9, name: "", type: "divider" },
+            {
+                key: 5,
+                name: "DeepSeek",
+                image: "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/deepseek.svg",
+                imageWidth: "18px",
+            },
+            {
+                key: 6,
+                name: "OpenAI",
+                image: "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/openai.svg",
+                imageWidth: "18px",
+            },
+            {
+                key: 7,
+                name: "Alever",
+                color: "#2563eb",
+                image: "https://api.dicebear.com/9.x/initials/svg?seed=Alever",
+                avatarImg: true,
+            },
+        ].filter((item) => {
+            if (item.type === "header" || item.type === "divider") {
+                return true;
+            }
+
+            return !keyword || item.name.toLowerCase().includes(keyword);
+        });
+
         remoteLoading.value = false;
-        mentionLog.value = `mentionList(value: ${value || "empty"}, oldValue: ${oldValue || "empty"})`;
-        return mentionList;
-    },
-    filterFunc: (listItem, value, oldValue) => {
-        if (listItem.type === "header" || listItem.type === "divider") {
-            return true;
-        }
-
-        if (!value) {
-            return true;
-        }
-
-        mentionLog.value = `filterFunc(value: ${value}, oldValue: ${oldValue || "empty"})`;
-        return listItem.name.toLowerCase().includes(value.toLowerCase());
+        mentionLog.value = `filterFunc(value: ${value || "empty"}, oldValue: ${oldValue || "empty"})`;
     },
     chooseItemCallback: (chooseItem, value) => {
         mentionLog.value = `Selected: ${chooseItem.name} (input: ${value || "empty"})`;
@@ -104,8 +138,8 @@ Type `@` in the editor below to see the mention list attached directly to `power
 
 | Option | Type | Required | Default | Description |
 | :-- | :-- | :--: | :-- | :-- |
-| `mentionList` | `array \| (value, oldValue) => array \| Promise<array>` | No | `[]` | Returns the candidate list. Supports sync and async usage. The current implementation passes the latest input `value` and previous input `oldValue`. |
-| `filterFunc` | `(listItem, value, oldValue) => boolean \| Promise<boolean>` | No | `() => true` | Applies a second-pass filter to every item returned by `mentionList`. Supports sync and async usage. Usually keeps structural items like `header` and `divider`, while filtering regular entries by text or keywords. |
+| `mentionList` | `array \| () => array` | No | `[]` | Returns the candidate list that should currently be rendered. It does not perform filtering itself and usually just exposes data already prepared outside the component. |
+| `filterFunc` | `(value, oldValue) => void \| Promise<void>` | No | `() => true` | Acts as the external search or filtering entry point. The component calls it whenever the input changes, and you can request data, update cache, or rebuild the list here before `mentionList()` returns the new result. |
 | `chooseItemCallback` | `(chooseItem, value) => void` | No | `() => console.log(...)` | Called after a candidate is selected. `chooseItem` is the final selected object and `value` is the current input text. |
 | `mentionClickCallback` | `(chooseItem, value) => void` | No | `() => console.log(...)` | Called when the user clicks a mention node that has already been inserted into the editor. |
 | `placeholder` | `(currentItem, value) => string` | No | `() => "mention"` | Returns the input placeholder dynamically. The component also syncs the result back to the node's `placeholder` attribute. |
@@ -114,7 +148,7 @@ Type `@` in the editor below to see the mention list attached directly to `power
 
 ## Candidate Item Shape
 
-`mentionList` returns an array, and each object in that array represents one candidate item. Common fields are:
+`mentionList()` returns an array, and each object in that array represents one candidate item. Common fields are:
 
 | Field | Type | Required | Description |
 | :-- | :-- | :--: | :-- |
@@ -136,47 +170,43 @@ Additional notes:
 
 ## Function Parameters
 
-### mentionList(value, oldValue)
-
-- `value`: latest text in the input.
-- `oldValue`: previous text before the latest change.
+### mentionList()
 
 Typical use cases:
 
 - Local static data: return an array directly.
-- Remote search: request data based on `value` and return the result.
-- Incremental search: compare `value` and `oldValue` to decide whether to search again, reuse cache, or return a previous result.
+- External state management: return the list currently stored in a `ref`, store, or cache.
+- Combined with `filterFunc`: let `filterFunc` finish the external search first, then expose the final result through `mentionList()`.
 
 ```vue
+const mentionSource = ref([]);
+
 const mentionItemAttr = {
-    mentionList: async (value, oldValue) => {
-        console.log("mentionList", { value, oldValue });
-        return await fetchUsers(value);
-    },
+    mentionList: () => mentionSource.value,
 };
 ```
 
-### filterFunc(listItem, value, oldValue)
+### filterFunc(value, oldValue)
 
-- `listItem`: the candidate item currently being evaluated.
 - `value`: latest text in the input.
 - `oldValue`: previous text before the latest change.
 
 Typical use cases:
 
-- Always keep structural items such as `header` and `divider`.
-- Apply local fuzzy matching to static candidates.
-- Run a second pass over results from `mentionList` without triggering another remote request.
+- Trigger an external search based on the current input.
+- Update candidate data stored in a `ref`, store, or cache.
+- Keep all filtering logic outside the component, while the component only renders what `mentionList()` returns.
 
 ```vue
-const mentionItemAttr = {
-    filterFunc: (listItem, value, oldValue) => {
-        if (listItem.type === "header" || listItem.type === "divider") {
-            return true;
-        }
+const mentionSource = ref([]);
 
-        console.log("filterFunc", { value, oldValue, listItem });
-        return listItem.name.toLowerCase().includes((value || "").toLowerCase());
+const mentionItemAttr = {
+    mentionList: () => mentionSource.value,
+    filterFunc: async (value, oldValue) => {
+        const result = await fetchUsers(value);
+
+        console.log("filterFunc", { value, oldValue });
+        mentionSource.value = result;
     },
 };
 ```
@@ -211,9 +241,11 @@ const mentionItemAttr = {
 import { ref } from "vue";
 
 const loading = ref(false);
+const mentionSource = ref([]);
 
 const mentionItemAttr = {
-    mentionList: async (value, oldValue) => {
+    mentionList: () => mentionSource.value,
+    filterFunc: async (value, oldValue) => {
         loading.value = true;
 
         const items = [
@@ -249,17 +281,17 @@ const mentionItemAttr = {
             },
         ];
 
-        loading.value = false;
-        console.log("mentionList", value, oldValue);
-        return items;
-    },
-    filterFunc: (listItem, value, oldValue) => {
-        if (listItem.type === "header" || listItem.type === "divider") {
-            return true;
-        }
+        const keyword = (value || "").toLowerCase();
+        mentionSource.value = items.filter((item) => {
+            if (item.type === "header" || item.type === "divider") {
+                return true;
+            }
 
+            return !keyword || item.name.toLowerCase().includes(keyword);
+        });
+
+        loading.value = false;
         console.log("filterFunc", value, oldValue);
-        return listItem.name.toLowerCase().includes((value || "").toLowerCase());
     },
     chooseItemCallback: (chooseItem, value) => {
         console.log("chooseItemCallback", chooseItem, value);
@@ -286,8 +318,8 @@ const mentionItemAttr = {
 
 ## Usage Notes
 
-- `mentionList` is the best place for fetching, caching, and remote search.
-- `filterFunc` should stay lightweight and focus on client-side filtering.
+- `mentionList` works best as a result reader that simply returns the data that should currently be displayed.
+- `filterFunc` is the right place for external search, request orchestration, filtering, and cache updates.
 - `placeholder` works well when the helper text should react to the current mention type, selected item, or input state.
 - If your candidates come from an API, keep the loading state outside the component and expose it through `isLoading`.
 - For avatar-style list items, provide `image` and set `avatarImg` to `true`.

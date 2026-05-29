@@ -6,7 +6,7 @@
 		:class="{
 			dark: thisTheme === 'dark',
 			selected: selected,
-			showing: showPopper && filterItems.length > 0,
+			showing: showPopper && thisMentionList.length > 0,
 		}"
 		:style="{
 			'--selected-bg': focusForeground,
@@ -16,12 +16,12 @@
 	>
 		<transition name="power-editor-mention-popper-fade">
 			<div
-				v-show="showPopper && filterItems.length > 0"
+				v-show="showPopper && thisMentionList.length > 0"
 				class="power-editor-mention-popper-container"
 				:style="{ left: `${left}px`, top: `${top}px` }"
 			>
 				<div
-					v-show="loading || isLoading()"
+					v-show="isLoading()"
 					class="power-editor-mention-popper-list-loading-block"
 				>
 					<fv-progressRing
@@ -33,7 +33,7 @@
 					></fv-progressRing>
 				</div>
 				<fv-list-view
-					:modelValue="filterItems"
+					:modelValue="thisMentionList"
 					:theme="thisTheme"
 					class="power-editor-mention-popper-list-view"
 					ref="list"
@@ -210,8 +210,6 @@ export default {
 				}
 				if (!_self) this.close();
 			},
-			filterItems: [],
-			loading: false,
 			thisTheme: this.editor.storage.defaultStorage.theme,
 			thisForeground:
 				this.editor.storage.defaultStorage.mentionItemTools.headerForeground(),
@@ -281,6 +279,12 @@ export default {
 
 			return placeholder || this.node.attrs.placeholder;
 		},
+		thisMentionList() {
+			return (
+				this.editor.storage.defaultStorage?.mentionItemTools?.mentionList() ||
+				[]
+			);
+		},
 	},
 	mounted() {
 		this.outSideClickInit();
@@ -330,27 +334,10 @@ export default {
 			}, 300);
 		},
 		async getFilterItems(newVal, oldVal) {
-			this.loading = true;
-			let result = [];
-			// provide value as a parameter to filter the mentionList.
-			let mentionList =
-				await this.editor.storage.defaultStorage.mentionItemTools.mentionList(
-					newVal,
-					oldVal,
-				);
-			for (let el of mentionList) {
-				if (
-					await this.editor.storage.defaultStorage.mentionItemTools.filterFunc(
-						el,
-						newVal,
-						oldVal,
-					)
-				) {
-					result.push(el);
-				}
-			}
-			this.filterItems = result;
-			this.loading = false;
+			await this.editor.storage.defaultStorage.mentionItemTools.filterFunc(
+				newVal,
+				oldVal,
+			);
 		},
 		chooseItem(event) {
 			this.updateAttributes({
@@ -581,7 +568,7 @@ export default {
 			overflow: hidden;
 
 			&.avatar {
-                max-width: 20px;
+				max-width: 15px;
 				border-radius: 50%;
 			}
 		}

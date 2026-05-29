@@ -1,6 +1,6 @@
 # MentionItem 提及项
 
-`MentionItem` 用于配置编辑器里的提及能力，比如 `@用户`、`#话题` 或业务对象选择。你可以通过 `mentionItemAttr` 把候选列表、过滤逻辑、加载状态、选择回调与点击回调传给 `PowerEditor`。
+`MentionItem` 用于配置编辑器里的提及能力，比如 `@用户`、`#话题` 或业务对象选择。你可以通过 `mentionItemAttr` 把候选列表、外部搜索逻辑、加载状态、选择回调与点击回调传给 `PowerEditor`。
 
 <script setup>
 import { ref } from "vue";
@@ -10,7 +10,7 @@ const viteData = useData();
 const mentionLog = ref("在下面的编辑器里输入 @，然后选择一个 mention 项。");
 const remoteLoading = ref(false);
 
-const mentionList = [
+const mentionSource = ref([
     { key: 0, name: "Mention Color", type: "header" },
     {
         key: 1,
@@ -47,29 +47,63 @@ const mentionList = [
         image: "https://api.dicebear.com/9.x/initials/svg?seed=Alever",
         avatarImg: true,
     },
-];
+]);
 
 const mentionItemAttr = {
-    mentionList: async (value, oldValue) => {
+    mentionList: () => mentionSource.value,
+    filterFunc: async (value, oldValue) => {
         remoteLoading.value = true;
 
         await new Promise((resolve) => setTimeout(resolve, 150));
 
+        const keyword = (value || "").toLowerCase();
+        mentionSource.value = [
+            { key: 0, name: "Mention Color", type: "header" },
+            {
+                key: 1,
+                name: "Blue",
+                color: "rgba(85, 153, 202, 1)",
+                icon: "WindowsLogo",
+                iconColor: "rgba(85, 153, 202, 1)",
+            },
+            {
+                key: 2,
+                name: "Purple",
+                color: "#958DF1",
+                icon: "DelveAnalyticsLogo",
+                iconColor: "#958DF1",
+            },
+            { key: 3, name: "AI Models", type: "header" },
+            { key: 9, name: "", type: "divider" },
+            {
+                key: 5,
+                name: "DeepSeek",
+                image: "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/deepseek.svg",
+                imageWidth: "18px",
+            },
+            {
+                key: 6,
+                name: "OpenAI",
+                image: "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/openai.svg",
+                imageWidth: "18px",
+            },
+            {
+                key: 7,
+                name: "Alever",
+                color: "#2563eb",
+                image: "https://api.dicebear.com/9.x/initials/svg?seed=Alever",
+                avatarImg: true,
+            },
+        ].filter((item) => {
+            if (item.type === "header" || item.type === "divider") {
+                return true;
+            }
+
+            return !keyword || item.name.toLowerCase().includes(keyword);
+        });
+
         remoteLoading.value = false;
-        mentionLog.value = `mentionList(value: ${value || "空"}, oldValue: ${oldValue || "空"})`;
-        return mentionList;
-    },
-    filterFunc: (listItem, value, oldValue) => {
-        if (listItem.type === "header" || listItem.type === "divider") {
-            return true;
-        }
-
-        if (!value) {
-            return true;
-        }
-
-        mentionLog.value = `filterFunc(value: ${value}, oldValue: ${oldValue || "空"})`;
-        return listItem.name.toLowerCase().includes(value.toLowerCase());
+        mentionLog.value = `filterFunc(value: ${value || "空"}, oldValue: ${oldValue || "空"})`;
     },
     chooseItemCallback: (chooseItem, value) => {
         mentionLog.value = `已选择: ${chooseItem.name} (输入值: ${value || "空"})`;
@@ -104,8 +138,8 @@ const mentionItemAttr = {
 
 | 属性 | 类型 | 必填 | 默认值 | 说明 |
 | :-- | :-- | :--: | :-- | :-- |
-| `mentionList` | `array \| (value, oldValue) => array \| Promise<array>` | 否 | `[]` | 返回候选项列表。支持同步或异步。当前实现会把输入框的新值 `value` 和旧值 `oldValue` 传进去。 |
-| `filterFunc` | `(listItem, value, oldValue) => boolean \| Promise<boolean>` | 否 | `() => true` | 对 `mentionList` 返回的每一项做二次过滤。支持同步或异步。通常保留 `header`、`divider` 之类结构项，普通项按名称或关键字过滤。 |
+| `mentionList` | `array \| () => array` | 否 | `[]` | 返回当前需要展示的候选项列表。这里不参与过滤，通常只负责把外部已经准备好的数据直接交给组件渲染。 |
+| `filterFunc` | `(value, oldValue) => void \| Promise<void>` | 否 | `() => true` | 作为外部搜索或过滤入口。组件在输入变化时调用它，你可以在这里请求接口、更新缓存或重算列表，然后让 `mentionList()` 返回新的结果。 |
 | `chooseItemCallback` | `(chooseItem, value) => void` | 否 | `() => console.log(...)` | 用户选中候选项后触发。`chooseItem` 是最终选中的对象，`value` 是当前输入值。 |
 | `mentionClickCallback` | `(chooseItem, value) => void` | 否 | `() => console.log(...)` | 点击已经插入到编辑器中的 mention 节点时触发。 |
 | `placeholder` | `(currentItem, value) => string` | 否 | `() => "mention"` | 动态返回输入框占位文案。组件会把结果同步回节点的 `placeholder` 属性。 |
@@ -114,7 +148,7 @@ const mentionItemAttr = {
 
 ## 候选项数据结构
 
-`mentionList` 返回的是一个数组，数组里的每个对象都代表一个候选项。常用字段如下：
+`mentionList()` 返回的是一个数组，数组里的每个对象都代表一个候选项。常用字段如下：
 
 | 字段 | 类型 | 必填 | 说明 |
 | :-- | :-- | :--: | :-- |
@@ -136,47 +170,43 @@ const mentionItemAttr = {
 
 ## 函数参数说明
 
-### mentionList(value, oldValue)
-
-- `value`：当前输入框里的最新文本。
-- `oldValue`：变更前的旧文本。
+### mentionList()
 
 适用场景：
 
 - 本地静态列表：直接返回数组。
-- 远程搜索：根据 `value` 发请求并返回结果。
-- 增量查询：根据 `value` 和 `oldValue` 判断是继续搜索、复用缓存，还是直接返回上一次结果。
+- 外部状态管理：返回 `ref`、store 或缓存里当前已经准备好的列表。
+- 配合 `filterFunc`：由 `filterFunc` 先完成外部搜索，再由 `mentionList()` 暴露最终结果。
 
 ```vue
+const mentionSource = ref([]);
+
 const mentionItemAttr = {
-    mentionList: async (value, oldValue) => {
-        console.log("mentionList", { value, oldValue });
-        return await fetchUsers(value);
-    },
+    mentionList: () => mentionSource.value,
 };
 ```
 
-### filterFunc(listItem, value, oldValue)
+### filterFunc(value, oldValue)
 
-- `listItem`：当前正在判断的候选项对象。
 - `value`：当前输入框里的最新文本。
 - `oldValue`：变更前的旧文本。
 
 适用场景：
 
-- 保留 `header`、`divider` 这种分组项。
-- 对本地候选项做前端模糊匹配。
-- 在不重新请求接口的情况下，对 `mentionList` 的结果做二次筛选。
+- 根据输入值发起外部搜索。
+- 更新 store、缓存或 `ref` 中的候选数据。
+- 把所有过滤逻辑集中在外部，组件内部只负责展示 `mentionList()` 返回的结果。
 
 ```vue
-const mentionItemAttr = {
-    filterFunc: (listItem, value, oldValue) => {
-        if (listItem.type === "header" || listItem.type === "divider") {
-            return true;
-        }
+const mentionSource = ref([]);
 
-        console.log("filterFunc", { value, oldValue, listItem });
-        return listItem.name.toLowerCase().includes((value || "").toLowerCase());
+const mentionItemAttr = {
+    mentionList: () => mentionSource.value,
+    filterFunc: async (value, oldValue) => {
+        const result = await fetchUsers(value);
+
+        console.log("filterFunc", { value, oldValue });
+        mentionSource.value = result;
     },
 };
 ```
@@ -211,9 +241,11 @@ const mentionItemAttr = {
 import { ref } from "vue";
 
 const loading = ref(false);
+const mentionSource = ref([]);
 
 const mentionItemAttr = {
-    mentionList: async (value, oldValue) => {
+    mentionList: () => mentionSource.value,
+    filterFunc: async (value, oldValue) => {
         loading.value = true;
 
         const items = [
@@ -249,17 +281,17 @@ const mentionItemAttr = {
             },
         ];
 
-        loading.value = false;
-        console.log("mentionList", value, oldValue);
-        return items;
-    },
-    filterFunc: (listItem, value, oldValue) => {
-        if (listItem.type === "header" || listItem.type === "divider") {
-            return true;
-        }
+        const keyword = (value || "").toLowerCase();
+        mentionSource.value = items.filter((item) => {
+            if (item.type === "header" || item.type === "divider") {
+                return true;
+            }
 
+            return !keyword || item.name.toLowerCase().includes(keyword);
+        });
+
+        loading.value = false;
         console.log("filterFunc", value, oldValue);
-        return listItem.name.toLowerCase().includes((value || "").toLowerCase());
     },
     chooseItemCallback: (chooseItem, value) => {
         console.log("chooseItemCallback", chooseItem, value);
@@ -286,8 +318,8 @@ const mentionItemAttr = {
 
 ## 使用建议
 
-- `mentionList` 适合处理取数、缓存和远程请求。
-- `filterFunc` 适合处理轻量级前端过滤，尽量不要在这里做重请求。
+- `mentionList` 更适合做“结果读取器”，直接返回当前要展示的数据。
+- `filterFunc` 适合做外部搜索入口，把请求、过滤、缓存更新都放在这里。
 - `placeholder` 适合根据当前 mention 类型、已选项或输入状态动态调整提示文案。
 - 如果你的候选项来自接口，建议把 loading 状态单独维护，再通过 `isLoading` 返回给组件。
 - 如果列表项需要头像样式，传 `image` 并把 `avatarImg` 设为 `true` 即可。
