@@ -275,12 +275,10 @@ import { Editor, EditorContent } from "@tiptap/vue-3";
 import { BubbleMenu as TiptapBubbleMenu } from "@tiptap/vue-3/menus";
 import { Extension } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Highlight from "@tiptap/extension-highlight";
 import { Color } from "@tiptap/extension-color";
-import Link from "@tiptap/extension-link";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -377,14 +375,12 @@ export default {
 					// provide options for starterkit configuration
 					...this.starterKit,
 				}),
-				Underline,
 				TextAlign.configure({
 					types: ["heading", "paragraph"],
 				}),
 				TextStyle,
 				Highlight.configure({ multicolor: true }),
 				Color,
-				Link,
 				Subscript,
 				Superscript,
 				CodeBlockLowlight.configure({
