@@ -1,6 +1,10 @@
 # Markdown Decoder Plugins
 
-`PowerEditor` includes a built-in Markdown decoder that converts ProseMirror nodes and marks into Markdown. With `mdDecNodeFuncsPlugins` and `mdFlags`, you can override or extend how specific nodes and marks are rendered.
+`PowerEditor` includes built-in Markdown import and export support:
+
+- Use `editor.insertMarkdown(markdown)` to import Markdown into the editor
+- Use `editor.saveMarkdown()` to export the current editor content as Markdown
+- Use `mdDecNodeFuncsPlugins` and `mdFlags` to customize how specific nodes and marks are rendered during export
 
 <script setup>
 import { ref } from "vue";
@@ -81,9 +85,90 @@ const saveMarkdownFile = () => {
     </power-editor>
 </div>
 
-## How It Works
+## Markdown Import And Export
 
-The decoder walks the ProseMirror document recursively in depth-first order. Built-in nodes use default decoder functions. You only need custom plugin functions for custom nodes or output formats that require special handling.
+### Import Markdown
+
+Use the exposed `insertMarkdown(markdown)` method to parse a Markdown string and write it into the editor.
+
+```vue
+<script setup>
+import { ref } from "vue";
+
+const editor = ref(null);
+
+const importMarkdown = () => {
+    const markdown = `# Hello PowerEditor
+
+- item 1
+- item 2
+`;
+
+    editor.value?.insertMarkdown(markdown);
+};
+</script>
+
+<template>
+    <fv-button @click="importMarkdown">Import Markdown</fv-button>
+    <power-editor ref="editor" />
+</template>
+```
+
+When importing from a file, the usual flow is to read the file text first and then call:
+
+```js
+const markdown = await file.text();
+editor.value?.insertMarkdown(markdown);
+```
+
+### Export Markdown
+
+Use `saveMarkdown()` to convert the current editor content into a Markdown string.
+
+```vue
+<script setup>
+import { ref } from "vue";
+
+const editor = ref(null);
+
+const exportMarkdown = () => {
+    const markdown = editor.value?.saveMarkdown?.() ?? "";
+    console.log(markdown);
+};
+</script>
+
+<template>
+    <fv-button @click="exportMarkdown">Export Markdown</fv-button>
+    <power-editor ref="editor" />
+</template>
+```
+
+If you want to download the result directly as a file:
+
+```js
+const markdown = editor.value?.saveMarkdown?.() ?? "";
+const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
+const url = URL.createObjectURL(blob);
+const link = document.createElement("a");
+
+link.href = url;
+link.download = "power-editor.md";
+link.click();
+
+URL.revokeObjectURL(url);
+```
+
+### Related Instance Methods
+
+| Method | Description |
+| :-- | :-- |
+| `editor.insertMarkdown(markdown)` | Parses Markdown and writes it into the editor. |
+| `editor.saveMarkdown()` | Exports the current editor content as a Markdown string. |
+| `editor.computeMarkdown(markdown)` | Only parses Markdown and returns editor-friendly content data without writing it into the editor. |
+
+## How To Customize Export Output
+
+During Markdown export, the decoder traverses the ProseMirror document recursively in depth-first order. Built-in nodes use default decoder functions. You only need custom plugin functions for custom nodes or output formats that need special handling.
 
 Plugin function names must match node names or mark names. A function can return a string, or an object with `prefix` and `suffix`.
 
@@ -107,10 +192,10 @@ The example below renders `blockquote` with the correct number of `>` prefixes b
 ```js
 blockquote(node, flags) {
     const { blockquote: level } = flags;
-    let prefix = '';
+    let prefix = "";
 
     for (let i = 0; i < level; i++) {
-        prefix += '>';
+        prefix += ">";
     }
 
     return `\n${prefix} `;
@@ -146,6 +231,7 @@ When traversal enters a tracked node, its flag changes from `false` to `1`. If t
 
 ```vue
 <power-editor
+    ref="editor"
     :md-dec-node-funcs-plugins="mdDecNodeFuncsPlugins"
     :md-flags="mdFlags"
 />
@@ -158,10 +244,10 @@ export default {
             mdDecNodeFuncsPlugins: {
                 blockquote: (node, flags) => {
                     const { blockquote: level } = flags;
-                    let prefix = '';
+                    let prefix = "";
 
                     for (let i = 0; i < level; i++) {
-                        prefix += '>';
+                        prefix += ">";
                     }
 
                     return `\n${prefix} `;
@@ -175,9 +261,17 @@ export default {
 };
 ```
 
+Then export with:
+
+```js
+const markdown = editor.value?.saveMarkdown?.() ?? "";
+```
+
+The resulting Markdown will use your custom rules.
+
 ## Custom Marks
 
-Mark plugins follow the same rule: the function name must match the mark name. The example below outputs the `color` value from `textStyle` as an HTML `font` tag:
+Mark plugins follow the same naming rule: the function name must match the mark name. The example below outputs the `color` value from `textStyle` as an HTML `font` tag:
 
 ```markdown
 <font color="red">Red text</font>
@@ -189,7 +283,7 @@ textStyle(text, mark) {
 
     return {
         prefix: `<font color="${color}">`,
-        suffix: '</font>'
+        suffix: "</font>"
     };
 }
 ```
