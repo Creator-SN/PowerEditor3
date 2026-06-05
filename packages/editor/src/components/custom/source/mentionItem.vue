@@ -294,8 +294,12 @@ export default {
 		this.outSideClickInit();
 		this.windowEventInit();
 		if (this.thisPlaceholder !== this.node.attrs.placeholder) {
-			this.updateAttributes({
-				placeholder: this.thisPlaceholder,
+            // 其实大可放弃note.attrs.placeholder，因为placeholder是根据currentItem和value计算的
+            // 这里不使用$nextTick的话, mounted() 里立刻 updateAttributes()，触发了 NodeView 重排；这时 TipTap 还在给旧 NodeView 发 selectionUpdate，旧实例里的 getPos() 就炸了。
+			this.$nextTick(() => {
+				this.updateAttributes({
+					placeholder: this.thisPlaceholder,
+				});
 			});
 		}
 		setTimeout(() => {
