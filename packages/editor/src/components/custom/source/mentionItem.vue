@@ -222,7 +222,7 @@ export default {
 	watch: {
 		thisPlaceholder(val) {
 			if (val !== this.node.attrs.placeholder) {
-				this.updateAttributes({
+				this.safeUpdateAttributes({
 					placeholder: val,
 				});
 			}
@@ -294,15 +294,15 @@ export default {
 		this.outSideClickInit();
 		this.windowEventInit();
 		if (this.thisPlaceholder !== this.node.attrs.placeholder) {
-			this.updateAttributes({
+			this.safeUpdateAttributes({
 				placeholder: this.thisPlaceholder,
 			});
 		}
 		setTimeout(() => {
-			if (!this.node.attrs.freeze) {
+			if (!this.node.attrs.freeze && this.isNodeActive()) {
 				this.show();
-				this.$refs.target.focus();
-				this.$refs.list.setFocus();
+				this.$refs.target?.focus?.();
+				this.$refs.list?.setFocus?.();
 			}
 		}, 300);
 		this.getFilterItems(this.node.attrs.value, "");
@@ -331,10 +331,10 @@ export default {
 			else this.top = top + 30;
 		},
 		show() {
-			if (!this.editor.isEditable) return;
+			if (!this.editor.isEditable || !this.isNodeActive()) return;
 			this.showPopper = true;
 			setTimeout(() => {
-				this.$refs.target.focus();
+				if (this.isNodeActive()) this.$refs.target?.focus?.();
 			}, 300);
 		},
 		async getFilterItems(newVal, oldVal) {
@@ -344,7 +344,8 @@ export default {
 			);
 		},
 		chooseItem(event) {
-			this.updateAttributes({
+			if (!this.isNodeActive()) return;
+			this.safeUpdateAttributes({
 				value: event.item.name,
 				currentItem: event.item,
 				freeze: true,
@@ -378,22 +379,24 @@ export default {
 		},
 		close() {
 			this.showPopper = false;
-			this.$refs.list.setBlur();
+			this.$refs.list?.setBlur?.();
 			this.editor.commands.focus();
 		},
 		closeWithoutSelection() {
 			this.close();
+			const pos = this.getSafePos();
+			if (pos === null) return;
 			const { tr } = this.editor.view.state;
 			let selection = null;
 			if (this.$refs.target.selectionEnd === 0)
-				selection = TextSelection.near(tr.doc.resolve(this.getPos()));
+				selection = TextSelection.near(tr.doc.resolve(pos));
 			else
 				selection = TextSelection.near(
-					tr.doc.resolve(this.getPos() + this.node.nodeSize - 1),
+					tr.doc.resolve(pos + this.node.nodeSize - 1),
 				);
 			tr.setSelection(selection);
 			this.editor.view.dispatch(tr);
-			this.updateAttributes({
+			this.safeUpdateAttributes({
 				freeze: true,
 			});
 		},
@@ -413,6 +416,32 @@ export default {
 				if (startPos === this.$refs.target.value.length) {
 					this.closeWithoutSelection();
 				}
+			}
+		},
+		getSafePos() {
+			if (typeof this.getPos !== "function") return null;
+			try {
+				const pos = this.getPos();
+				if (typeof pos !== "number") return null;
+				const nodeAtPos = this.editor?.state?.doc?.nodeAt?.(pos);
+				if (!nodeAtPos || nodeAtPos.type?.name !== this.node.type.name) {
+					return null;
+				}
+				return pos;
+			} catch (e) {
+				return null;
+			}
+		},
+		isNodeActive() {
+			return this.getSafePos() !== null;
+		},
+		safeUpdateAttributes(attrs) {
+			if (!this.isNodeActive()) return false;
+			try {
+				this.updateAttributes(attrs);
+				return true;
+			} catch (e) {
+				return false;
 			}
 		},
 	},
