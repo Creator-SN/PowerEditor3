@@ -9,6 +9,7 @@ import { useData } from "vitepress";
 const viteData = useData();
 const editor = ref(null);
 const mdFileInput = ref(null);
+const editable = ref(true);
 const editorContent = ref("<h2>PowerEditor Markdown Demo</h2><p>点击右上角按钮导入或导出 Markdown。</p>");
 
 const openMarkdownFile = () => {
@@ -38,7 +39,17 @@ const exportMarkdown = async () => {
 };
 </script>
 
-<power-editor :theme="viteData.isDark.value ? 'dark' : 'light'" :showDragHandler="true" style="width: 100%;"></power-editor>
+<div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 12px;">
+    <span>{{ editable ? "可编辑" : "只读" }}</span>
+    <fv-toggle-switch v-model="editable"></fv-toggle-switch>
+</div>
+
+<power-editor
+    :theme="viteData.isDark.value ? 'dark' : 'light'"
+    :editable="editable"
+    :showDragHandler="true"
+    style="width: 100%;"
+></power-editor>
 
 ## 基础用法
 
