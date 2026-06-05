@@ -33,10 +33,14 @@
         "@tiptap/extension-bubble-menu": "3.23.6",
         "@tiptap/extension-code-block": "3.23.6",
         "@tiptap/extension-code-block-lowlight": "3.23.6",
+        "@tiptap/extension-collaboration": "^3.26.0",
         "@tiptap/extension-color": "3.23.6",
         "@tiptap/extension-details": "^3.25.0",
+        "@tiptap/extension-drag-handle": "^3.26.0",
+        "@tiptap/extension-drag-handle-vue-3": "^3.26.0",
         "@tiptap/extension-highlight": "3.23.6",
         "@tiptap/extension-link": "3.23.6",
+        "@tiptap/extension-node-range": "^3.26.0",
         "@tiptap/extension-placeholder": "3.23.6",
         "@tiptap/extension-subscript": "3.23.6",
         "@tiptap/extension-superscript": "3.23.6",
@@ -52,6 +56,7 @@
         "@tiptap/pm": "3.23.6",
         "@tiptap/starter-kit": "3.23.6",
         "@tiptap/vue-3": "3.23.6",
+        "@tiptap/y-tiptap": "^3.0.4",
         "autoprefixer": "^10.4.21",
         "core-js": "3.30.1",
         "d3": "7.0.4",
@@ -69,7 +74,9 @@
         "simplify-js": "^1.2.4",
         "unplugin-vue-define-options": "^3.0.0-beta.14",
         "url": "^0.11.4",
-        "vue": "^3.5.13"
+        "vue": "^3.5.13",
+        "y-protocols": "^1.0.7",
+        "yjs": "^13.6.31"
     },
     "devDependencies": {
         "@types/node": "^24.0.3",

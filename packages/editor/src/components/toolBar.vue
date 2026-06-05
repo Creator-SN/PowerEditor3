@@ -426,7 +426,7 @@
 			:title="getTitle('Details')"
 			@click="toggleDetails"
 		>
-			<i class="ms-Icon ms-Icon--StatusTriangleInner"></i>
+			<i class="ms-Icon ms-Icon--ShowResults"></i>
 		</fv-button>
 		<fv-button
 			class="power-editor-cmd-btn"

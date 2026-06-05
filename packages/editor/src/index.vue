@@ -130,6 +130,12 @@
 				:showSave="showSave"
 			></bubble-tool-bar>
 		</tiptap-bubble-menu>
+		<drag-handler
+			v-if="showDragHandler"
+			:editor="editor"
+			:theme="theme"
+			:nested="dragHandlerNested"
+		></drag-handler>
 	</div>
 </template>
 
@@ -252,6 +258,12 @@ const props = defineProps({
 	showSave: {
 		default: true,
 	},
+	showDragHandler: {
+		default: false,
+	},
+	dragHandlerNested: {
+		default: false,
+	},
 	language: {
 		default: "cn",
 	},
@@ -307,6 +319,7 @@ import FormatPainter from "./components/custom/extension/formatPainter.js";
 
 import toolBar from "./components/toolBar.vue";
 import bubbleToolBar from "./components/bubbleToolBar.vue";
+import DragHandler from "./components/custom/basic/dragHandler.vue";
 
 import i18n from "../../i18n/i18n.js";
 
@@ -317,6 +330,7 @@ export default {
 		TiptapBubbleMenu,
 		toolBar,
 		bubbleToolBar,
+		DragHandler,
 	},
 	data() {
 		return {
