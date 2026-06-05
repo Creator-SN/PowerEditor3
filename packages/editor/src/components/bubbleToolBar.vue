@@ -350,6 +350,7 @@ export default {
 
     &.dark {
         background: rgba(50, 50, 50, 1);
+        border: rgba(36, 36, 36, 0.1) solid thin;
 
         hr {
             background: rgba(200, 200, 200, 0.1);

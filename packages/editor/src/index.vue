@@ -287,6 +287,11 @@ import { Table } from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
+import {
+	Details,
+	DetailsContent,
+	DetailsSummary,
+} from "@tiptap/extension-details";
 import { lowlight } from "./js/lowlight";
 import { Encoder, Decoder } from "./js/markdown";
 
@@ -336,7 +341,8 @@ export default {
 		},
 		theme() {
 			this.propsSync();
-			if (this.editor?.view) { // tiptap 3.23.6有懒更新, NodeView 组件的刷新时机被 Tiptap 绑定在编辑器更新周期上了, 这里建立一个空的state, 让editor更新一下.
+			if (this.editor?.view) {
+				// tiptap 3.23.6有懒更新, NodeView 组件的刷新时机被 Tiptap 绑定在编辑器更新周期上了, 这里建立一个空的state, 让editor更新一下.
 				this.editor.view.dispatch(
 					this.editor.state.tr.setMeta("theme-change", this.theme),
 				);
@@ -405,6 +411,14 @@ export default {
 				TableRow,
 				TableHeader,
 				TableCell,
+				Details.configure({
+					persist: true,
+					HTMLAttributes: {
+						class: "details",
+					},
+				}),
+				DetailsSummary,
+				DetailsContent,
 				this.defaultStorageInit(),
 				FormatPainter,
 				...this.extensions,

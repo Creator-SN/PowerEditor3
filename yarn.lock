@@ -170,10 +170,10 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
-"@creatorsn/vfluent3@^0.3.80":
-  version "0.3.80"
-  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.80.tgz#c1c62706cffdcccab8fa44d4389f483a785f3cf3"
-  integrity sha512-Z4DGOHggKCalJog2XI05VnzKFnZpIeubPe/l1CQW8jaVN1ajcTJU3okyshDYSBAt7+IPpCK6+WLivXjuEf0tlg==
+"@creatorsn/vfluent3@^0.3.90":
+  version "0.3.90"
+  resolved "https://registry.yarnpkg.com/@creatorsn/vfluent3/-/vfluent3-0.3.90.tgz#d01273f6dce663eebab17768393450483c7ccbe0"
+  integrity sha512-Hps9TbUY1z0gGyyavaixVr1VCFS/6VNAbrRdS/YXFaNpdvxn8vu+DnqnZCs5hY1BBCGJQUCmgJ62seGSc0z/IQ==
   dependencies:
     "@vue/shared" "^3.4.20"
     gsap "3.1.1"
@@ -781,6 +781,11 @@
   version "3.23.6"
   resolved "https://registry.npmjs.org/@tiptap/extension-color/-/extension-color-3.23.6.tgz"
   integrity sha512-2WxYc+X+OGFXbq/Ak0VXODEzfK1l5wz33oTWSuhdSw44HAQM7+SSyiDnMCXDQdqi063ANqMmQmlw5WngjQ6wCA==
+
+"@tiptap/extension-details@^3.25.0":
+  version "3.25.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-details/-/extension-details-3.25.0.tgz#b511f5436ea44e6045f300363c6d5fd2baff7081"
+  integrity sha512-w+iUjTRD1uyZHM70TeH3Dn2Pe6Q6V40Ay8K/rN/q6zcAwq07QbeE8/l9b6JpvTnalpS8uVpoiGKwvnwvUcv5pA==
 
 "@tiptap/extension-document@^3.23.6":
   version "3.23.6"
