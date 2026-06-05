@@ -55,6 +55,13 @@ const exportMarkdown = async () => {
 </template>
 ```
 
+## 扩展指南
+
+- [ImgInterceptor](./img-interceptor)
+- [HandleImagePaste / HandleImageDrop](./image-paste-drop)
+- [MentionItem](./mention-item)
+- [Markdown Decoder Plugins](./markdown-decoder-plugins)
+
 ## Props
 
 | 属性 | 类型 | 必填 | 默认值 | 说明 |

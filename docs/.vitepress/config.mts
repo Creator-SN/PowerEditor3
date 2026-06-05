@@ -14,7 +14,8 @@ const powerEditorSidebar = [
         items: [
             { text: 'MentionItem 提及项', link: '/components/powerEditor/mention-item' },
             { text: 'Markdown Decoder Plugins', link: '/components/powerEditor/markdown-decoder-plugins' },
-            { text: 'ImgInterceptor 图片拦截器', link: '/components/powerEditor/img-interceptor' }
+            { text: 'ImgInterceptor 图片拦截器', link: '/components/powerEditor/img-interceptor' },
+            { text: 'HandleImagePaste / HandleImageDrop', link: '/components/powerEditor/image-paste-drop' }
         ]
     },
     {
@@ -38,7 +39,8 @@ const powerEditorSidebarEn = [
         items: [
             { text: 'MentionItem', link: '/en/components/powerEditor/mention-item' },
             { text: 'Markdown Decoder Plugins', link: '/en/components/powerEditor/markdown-decoder-plugins' },
-            { text: 'ImgInterceptor', link: '/en/components/powerEditor/img-interceptor' }
+            { text: 'ImgInterceptor', link: '/en/components/powerEditor/img-interceptor' },
+            { text: 'HandleImagePaste / HandleImageDrop', link: '/en/components/powerEditor/image-paste-drop' }
         ]
     }
 ]

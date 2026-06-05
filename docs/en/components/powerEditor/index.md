@@ -55,6 +55,13 @@ const exportMarkdown = async () => {
 </template>
 ```
 
+## Extension Guides
+
+- [ImgInterceptor](./img-interceptor)
+- [HandleImagePaste / HandleImageDrop](./image-paste-drop)
+- [MentionItem](./mention-item)
+- [Markdown Decoder Plugins](./markdown-decoder-plugins)
+
 ## Props
 
 | Prop | Type | Required | Default | Description |
