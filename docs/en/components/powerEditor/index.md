@@ -108,6 +108,7 @@ const exportMarkdown = async () => {
 | `codeColor` | `string` | No | - | Inline code or code block color. |
 | `imgPreview` | `boolean` | No | `true` | Whether to enable image preview. |
 | `imgLazyLoad` | `boolean` | No | `false` | Whether to lazy-load images. |
+| `useTab` | `boolean` | No | `false` | Whether to let the `Tab` key insert a tab character. When enabled, it does not insert inside bullet or ordered lists. |
 | `theme` | `'light' \| 'dark'` | No | `light` | Editor theme. |
 | `extensions` | `array` | No | `[]` | Extra Tiptap extensions. |
 | `showSave` | `boolean` | No | `true` | Whether to show the save button. |

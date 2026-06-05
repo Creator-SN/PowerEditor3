@@ -108,6 +108,7 @@ const exportMarkdown = async () => {
 | `codeColor` | `string` | 否 | - | 行内代码或代码块颜色。 |
 | `imgPreview` | `boolean` | 否 | `true` | 是否启用图片预览。 |
 | `imgLazyLoad` | `boolean` | 否 | `false` | 是否启用图片懒加载。 |
+| `useTab` | `boolean` | 否 | `false` | 是否启用 `Tab` 键插入制表符。启用后，在无序列表和有序列表中不会插入。 |
 | `theme` | `'light' \| 'dark'` | 否 | `light` | 编辑器主题。 |
 | `extensions` | `array` | 否 | `[]` | 额外的 Tiptap 扩展。 |
 | `showSave` | `boolean` | 否 | `true` | 是否显示保存按钮。 |

@@ -243,6 +243,10 @@ const props = defineProps({
 	imgLazyLoad: {
 		default: true,
 	},
+	useTab: {
+		default: false,
+		type: Boolean,
+	},
 	extensions: {
 		default: () => [],
 	},
@@ -457,19 +461,9 @@ export default {
 				content: this.modelValue,
 				extensions,
 				editorProps: {
-					//ProseMirror Editor Props//
-					// handlePaste(view, e, slice) {
-					//     let placeholder = {
-					//         view,
-					//         e,
-					//         slice,
-					//     };
-					//     let event = placeholder.e;
-					//     event.stopPropagation();
-					//     event.preventDefault();
-					//     el.customPaste(event);
-					//     return true;
-					// },
+					handleKeyDown(view, event) {
+						return el.handleEditorKeyDown(event);
+					},
 				},
 				onUpdate() {
 					el.$emit("change");
@@ -495,6 +489,27 @@ export default {
 					}
 				}
 			});
+		},
+		handleEditorKeyDown(event) {
+			if (!this.useTab || event.key !== "Tab") {
+				return false;
+			}
+
+			event.preventDefault();
+
+			if (
+				this.editor.isActive("bulletList") ||
+				this.editor.isActive("orderedList")
+			) {
+				return true;
+			}
+
+			if (!this.editable) {
+				return true;
+			}
+
+			this.editor.commands.insertContent("\t");
+			return true;
 		},
 		bubbleMenuShouldShow({ editor, view, state, from, to }) {
 			if (!this.editable) {
