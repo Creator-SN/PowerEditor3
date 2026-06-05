@@ -2,8 +2,8 @@
 	<div class="power-editor-container" :class="[{ dark: theme === 'dark' }]">
 		<transition name="power-editor-tool-bar-fade-in">
 			<tool-bar
-				v-if="editor && editable"
-				v-show="showToolBar"
+				v-if="editor"
+				v-show="editable && showToolBar"
 				:editor="editor"
 				:theme="theme"
 				:foreground="foreground"
@@ -66,8 +66,8 @@
 			</tool-bar>
 		</transition>
 		<div
-			v-if="editor && editable"
-			v-show="showToolBar"
+			v-if="editor"
+			v-show="editable && showToolBar"
 			class="power-editor-tool-bar-acrylic-background"
 			:style="{
 				height: `${toolbarHeight}px`,
@@ -113,7 +113,8 @@
 			/>
 		</div>
 		<tiptap-bubble-menu
-			v-if="editor && editable"
+			v-if="editor"
+			v-show="editable"
 			:editor="editor"
 			:options="{
 				placement: 'top',
@@ -131,7 +132,8 @@
 			></bubble-tool-bar>
 		</tiptap-bubble-menu>
 		<drag-handler
-			v-if="showDragHandler"
+			v-if="editor && showDragHandler"
+			v-show="editable"
 			:editor="editor"
 			:theme="theme"
 			:nested="dragHandlerNested"
@@ -495,6 +497,10 @@ export default {
 			});
 		},
 		bubbleMenuShouldShow({ editor, view, state, from, to }) {
+			if (!this.editable) {
+				return false;
+			}
+
 			const hasSelection = from !== to;
 			const hasSelectedText = !!state.doc
 				.textBetween(from, to, " ")
