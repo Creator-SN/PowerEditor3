@@ -58,7 +58,7 @@ const exportMarkdown = async () => {
 ## 扩展指南
 
 - [ImgInterceptor](./img-interceptor)
-- [HandleImagePaste / HandleImageDrop](./image-paste-drop)
+- [图像注入优化](./image-paste-drop)
 - [MentionItem](./mention-item)
 - [Markdown Decoder Plugins](./markdown-decoder-plugins)
 

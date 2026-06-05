@@ -58,7 +58,7 @@ const exportMarkdown = async () => {
 ## Extension Guides
 
 - [ImgInterceptor](./img-interceptor)
-- [HandleImagePaste / HandleImageDrop](./image-paste-drop)
+- [Image Insertion Optimization](./image-paste-drop)
 - [MentionItem](./mention-item)
 - [Markdown Decoder Plugins](./markdown-decoder-plugins)
 
