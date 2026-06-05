@@ -38,7 +38,7 @@ const exportMarkdown = async () => {
 };
 </script>
 
-<power-editor :theme="viteData.isDark.value ? 'dark' : 'light'" style="width: 100%;"></power-editor>
+<power-editor :theme="viteData.isDark.value ? 'dark' : 'light'" :showDragHandler="true" style="width: 100%;"></power-editor>
 
 ## Basic Usage
 
@@ -47,6 +47,7 @@ const exportMarkdown = async () => {
     <power-editor
         v-model="content"
         theme="light"
+        :showDragHandler="true"
         placeholder="Write something..."
         @change="handleChange"
         @save-html="handleSaveHtml"
@@ -130,6 +131,7 @@ Use a template ref to call exposed editor methods.
         ref="editor"
         v-model="editorContent"
         :theme="viteData.isDark.value ? 'dark' : 'light'"
+        :showDragHandler="true"
         style="width: 100%;"
     >
         <template #custom-buttons-front="{ defaultClass }">
@@ -192,7 +194,7 @@ const exportMarkdown = async () => {
         style="display: none;"
         @change="handleMarkdownImport"
     />
-    <power-editor ref="editor">
+    <power-editor ref="editor" :showDragHandler="true">
         <template #custom-buttons="{ defaultClass }">
             <fv-button
                 :class="[defaultClass, 'round-btn']"
