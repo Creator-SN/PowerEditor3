@@ -21,6 +21,13 @@
 <script>
 import { DragHandle } from "./index.js";
 
+const defaultFilterNodeTypes = [
+	"imageblock",
+	"equationBlock",
+	"drawingBlock",
+	"embedBlock",
+];
+
 export default {
 	name: "DragHandler",
 	components: {
@@ -34,6 +41,10 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		ignoreDragNodeType: {
+			default: () => [],
+			type: Array,
+		},
 		theme: {
 			default: "light",
 		},
@@ -43,12 +54,18 @@ export default {
 			visible: true,
 			nodeHeight: 0,
 			filterNodeTypes: [
-				"imageblock",
-				"equationBlock",
-				"drawingBlock",
-				"embedBlock",
+				...this.ignoreDragNodeType,
+				...defaultFilterNodeTypes,
 			],
 		};
+	},
+	watch: {
+		ignoreDragNodeType: {
+			handler(newVal, oldVal) {
+				this.filterNodeTypes = [...newVal, ...defaultFilterNodeTypes];
+			},
+			deep: true,
+		},
 	},
 	computed: {
 		nestedOptions() {

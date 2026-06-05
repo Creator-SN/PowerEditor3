@@ -135,6 +135,7 @@
 			:editor="editor"
 			:theme="theme"
 			:nested="dragHandlerNested"
+			:ignoreDragNodeType="ignoreDragNodeType"
 		></drag-handler>
 	</div>
 </template>
@@ -260,6 +261,10 @@ const props = defineProps({
 	},
 	showDragHandler: {
 		default: false,
+	},
+	ignoreDragNodeType: {
+		default: () => [],
+		type: Array,
 	},
 	dragHandlerNested: {
 		default: false,

@@ -99,6 +99,9 @@ const exportMarkdown = async () => {
 | `theme` | `'light' \| 'dark'` | No | `light` | Editor theme. |
 | `extensions` | `array` | No | `[]` | Extra Tiptap extensions. |
 | `showSave` | `boolean` | No | `true` | Whether to show the save button. |
+| `showDragHandler` | `boolean` | No | `false` | Whether to show the block drag handle. |
+| `ignoreDragNodeType` | `array` | No | `[]` | List of node types where the drag handle should be hidden. |
+| `dragHandlerNested` | `boolean` | No | `false` | Whether the drag handle should work inside nested block nodes. |
 
 ## Events
 

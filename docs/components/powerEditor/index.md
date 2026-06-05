@@ -99,6 +99,9 @@ const exportMarkdown = async () => {
 | `theme` | `'light' \| 'dark'` | 否 | `light` | 编辑器主题。 |
 | `extensions` | `array` | 否 | `[]` | 额外的 Tiptap 扩展。 |
 | `showSave` | `boolean` | 否 | `true` | 是否显示保存按钮。 |
+| `showDragHandler` | `boolean` | 否 | `false` | 是否显示块级拖拽手柄。 |
+| `ignoreDragNodeType` | `array` | 否 | `[]` | 忽略显示拖拽手柄的节点类型列表。 |
+| `dragHandlerNested` | `boolean` | 否 | `false` | 是否允许拖拽手柄在嵌套块节点中工作。 |
 
 ## Events
 
