@@ -19,8 +19,7 @@
 </template>
 
 <script>
-// @ts-nocheck
-import { DragHandle } from "@tiptap/extension-drag-handle-vue-3";
+import { DragHandle } from "./index.js";
 
 export default {
 	name: "DragHandler",

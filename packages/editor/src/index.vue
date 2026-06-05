@@ -319,7 +319,7 @@ import FormatPainter from "./components/custom/extension/formatPainter.js";
 
 import toolBar from "./components/toolBar.vue";
 import bubbleToolBar from "./components/bubbleToolBar.vue";
-import DragHandler from "./components/custom/basic/dragHandler.vue";
+import DragHandler from "./components/custom/basic/dragHandler/index.vue";
 
 import i18n from "../../i18n/i18n.js";
 
