@@ -42,6 +42,10 @@
         --selection-color: none;
         --table-drag-color: rgba(145, 191, 209, 1);
         --code-color: rgba(235, 87, 87, 1);
+        --tracked-change-insert-color: rgba(34, 197, 94, 0.18);
+        --tracked-change-insert-hover-color: rgba(34, 197, 94, 0.2);
+        --tracked-change-delete-color: rgba(235, 87, 87, 0.3);
+        --tracked-change-delete-hover-color: rgba(235, 87, 87, 0.35);
 
         &.read-only {
             padding-top: 5px;
@@ -115,18 +119,28 @@
 
             .tracked-change {
                 border-radius: 4px;
-                transition: background-color 0.2s ease, opacity 0.2s ease;
+                transition:
+                    background-color 0.2s ease,
+                    opacity 0.2s ease;
             }
 
             .tracked-change-insert {
-                background: rgba(34, 197, 94, 0.18);
+                background: var(--tracked-change-insert-color);
                 box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.28);
+
+                &:hover {
+                    background: var(--tracked-change-insert-hover-color);
+                }
             }
 
             .tracked-change-delete {
-                background: rgba(239, 68, 68, 0.14);
+                background: var(--tracked-change-delete-color);
                 box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.24);
                 text-decoration: line-through;
+
+                &:hover {
+                    background: var(--tracked-change-delete-hover-color);
+                }
             }
 
             p {
@@ -378,7 +392,7 @@
         }
     }
 
-	&.dark {
+    &.dark {
         background: rgba(47, 52, 55, 1);
 
         .power-editor-tool-bar-acrylic-background {

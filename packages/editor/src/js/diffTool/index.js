@@ -359,6 +359,14 @@ function addTrackedBlock(node, attrs) {
 		trackedChange: attrs,
 	};
 
+	if (cloned.type === "codeBlock") {
+		if (Array.isArray(cloned.content)) {
+			cloned.content = cloned.content.map((child) => cleanupTrackedMarks(clone(child)));
+		}
+
+		return cloned;
+	}
+
 	if (Array.isArray(cloned.content)) {
 		cloned.content = cloned.content.map((child) =>
 			addTrackedToInlineNode(child, attrs),
@@ -528,6 +536,32 @@ function buildReviewNodePair(sourceNode, targetNode) {
 function buildReplaceReviewNodes(sourceBlocks = [], targetBlocks = []) {
 	const result = [];
 	const pairCount = Math.min(sourceBlocks.length, targetBlocks.length);
+
+	// Only pair blocks positionally when both sides have the same block count.
+	// For many-to-one / one-to-many replacements, positional pairing can
+	// incorrectly fold unrelated siblings into one container diff and reorder
+	// the remaining blocks in reviewDoc.
+	if (sourceBlocks.length !== targetBlocks.length) {
+		if (sourceBlocks.length > 0) {
+			const groupId = guid();
+			result.push(
+				...sourceBlocks.map((block) =>
+					addTrackedBlock(block.node, buildTrackedAttrs("delete", groupId)),
+				),
+			);
+		}
+
+		if (targetBlocks.length > 0) {
+			const groupId = guid();
+			result.push(
+				...targetBlocks.map((block) =>
+					addTrackedBlock(block.node, buildTrackedAttrs("insert", groupId)),
+				),
+			);
+		}
+
+		return result;
+	}
 
 	for (let index = 0; index < pairCount; index += 1) {
 		const sourceBlock = sourceBlocks[index];

@@ -2,7 +2,13 @@
 	<node-view-wrapper
 		v-if="node"
 		class="power-editor-image-container"
-		:class="[{ dark: thisTheme === 'dark' }]"
+		:class="[
+			{ dark: thisTheme === 'dark' },
+			{ 'tracked-change': !!node.attrs.trackedChange },
+			node.attrs.trackedChange
+				? `tracked-change-${node.attrs.trackedChange.type}`
+				: '',
+		]"
 		:style="{
 			'justify-content': node.attrs.alignCenter ? 'center' : 'flex-start',
 		}"
@@ -34,6 +40,7 @@
 				style="width: 100%; height: auto"
 				:style="{
 					height: displayHeight,
+					opacity: node.attrs.trackedChange ? 0.5 : 1,
 				}"
 				@load="imgLoaded"
 				@error="imgError"

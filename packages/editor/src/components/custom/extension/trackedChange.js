@@ -1,4 +1,4 @@
-import { Mark, mergeAttributes } from "@tiptap/core";
+import { Extension, Mark, mergeAttributes } from "@tiptap/core";
 
 function buildTrackedChangeDataAttributes(attrs = {}) {
     const dataAttrs = {};
@@ -24,6 +24,17 @@ function buildTrackedChangeDataAttributes(attrs = {}) {
     }
 
     return dataAttrs;
+}
+
+function buildTrackedChangeHTMLAttributes(trackedChange) {
+    if (!trackedChange) {
+        return {};
+    }
+
+    return {
+        ...buildTrackedChangeDataAttributes(trackedChange),
+        class: getTrackedChangeClassName(trackedChange) || undefined,
+    };
 }
 
 function parseTrackedChangeDataAttributes(element) {
@@ -52,7 +63,7 @@ function buildTrackedChangeNodeAttribute() {
         parseHTML: (element) => parseTrackedChangeDataAttributes(element),
         renderHTML: (attrs) => {
             if (!attrs.trackedChange) return {};
-            return buildTrackedChangeDataAttributes(attrs.trackedChange);
+            return buildTrackedChangeHTMLAttributes(attrs.trackedChange);
         },
     };
 }
@@ -157,8 +168,42 @@ export const TrackedChange = Mark.create({
     },
 });
 
+export const TrackedChangeNodeAttributes = Extension.create({
+    name: "trackedChangeNodeAttributes",
+
+    addGlobalAttributes() {
+        return [
+            {
+                types: [
+                    "table",
+                    "tableRow",
+                    "tableCell",
+                    "bulletList",
+                    "orderedList",
+                    "details",
+                    "detailsContent",
+                    "detailsSummary",
+                    "listItem",
+                    "codeBlock",
+                    "imageblock",
+                    "embedblock",
+                    "equationBlock",
+                    "inlineEquation",
+                    "mentionItem",
+                    "drawingBlock",
+                    "powerTaskItem",
+                ],
+                attributes: {
+                    trackedChange: buildTrackedChangeNodeAttribute(),
+                },
+            },
+        ];
+    },
+});
+
 export {
     buildTrackedChangeDataAttributes,
+    buildTrackedChangeHTMLAttributes,
     buildTrackedChangeNodeAttribute,
     getTrackedChangeClassName,
     parseTrackedChangeDataAttributes,

@@ -78,7 +78,21 @@ function readCodeText(element) {
 }
 
 export default CodeBlockLowlight.extend({
-    transformPastedHTML(html) { // 处理粘贴的代码块, 一般粘贴的代码会套娃两层pre.
+    renderHTML({ node, HTMLAttributes }) {
+        const languageClassName =
+            node.attrs.language && this.options.languageClassPrefix
+                ? `${this.options.languageClassPrefix}${node.attrs.language}`
+                : null;
+
+        return [
+            "pre",
+            {
+                ...HTMLAttributes,
+            },
+            ["code", { class: languageClassName }, 0],
+        ];
+    },
+    transformPastedHTML(html) {
         if (!html || typeof DOMParser === "undefined") {
             return html;
         }

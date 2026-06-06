@@ -3,6 +3,12 @@
         v-if="node"
         as="li"
         class="power-editor-task-item-container"
+        :class="[
+            { 'tracked-change': !!node.attrs.trackedChange },
+            node.attrs.trackedChange
+                ? `tracked-change-${node.attrs.trackedChange.type}`
+                : '',
+        ]"
     >
         <fv-check-box
             v-model="node.attrs.checked"

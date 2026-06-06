@@ -1,7 +1,13 @@
 <template>
 	<node-view-wrapper
 		class="power-editor-code-block"
-		:class="[{ dark: thisTheme === 'dark' }]"
+		:class="[
+			{ dark: thisTheme === 'dark' },
+			{ 'tracked-change': !!node.attrs.trackedChange },
+			node.attrs.trackedChange
+				? `tracked-change-${node.attrs.trackedChange.type}`
+				: '',
+		]"
 	>
 		<div contenteditable="false" class="power-editor-code-block-banner">
 			<div class="power-editor-code-block-banner-left-block">
