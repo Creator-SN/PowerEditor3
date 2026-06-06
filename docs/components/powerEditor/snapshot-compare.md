@@ -12,14 +12,17 @@ This page demonstrates a snapshot compare flow for `power-editor`.
 import { nextTick, onMounted, ref } from "vue";
 import { useData } from "vitepress";
 import { computeDiff } from "@/packages/editor/src/js/diffTool/index.js";
+import { applyTrackedGroup } from "@/packages/editor/src/js/diffTool/apply.js";
 
 const viteData = useData();
 const sourceEditorRef = ref(null);
 const targetEditorRef = ref(null);
+const reviewEditorRef = ref(null);
 const reviewContent = ref({
 	type: "doc",
 	content: [],
 });
+const reviewChanges = ref([]);
 
 const sourceContent = ref({
 	type: "doc",
@@ -171,6 +174,130 @@ const targetContent = ref({
 	],
 });
 
+function truncateText(text = "", max = 48) {
+	const normalized = String(text).replace(/\s+/g, " ").trim();
+
+	if (!normalized) {
+		return "";
+	}
+
+	return normalized.length > max
+		? `${normalized.slice(0, max - 1)}...`
+		: normalized;
+}
+
+function getNodeLabel(node = {}) {
+	const labels = {
+		paragraph: "Paragraph",
+		heading: "Heading",
+		bulletList: "Bullet List",
+		orderedList: "Ordered List",
+		listItem: "List Item",
+		blockquote: "Blockquote",
+		codeBlock: "Code Block",
+		inlineEquation: "Inline Equation",
+		equationBlock: "Equation Block",
+		imageblock: "Image",
+		mentionItem: "Mention",
+		powerTaskItem: "Task Item",
+	};
+
+	return labels[node.type] || node.type || "Node";
+}
+
+function pushChangeOccurrence(changeMap, groupId, occurrence) {
+	if (!groupId) {
+		return;
+	}
+
+	if (!changeMap.has(groupId)) {
+		changeMap.set(groupId, {
+			groupId,
+			order: changeMap.size,
+			types: new Set(),
+			snippets: [],
+			count: 0,
+		});
+	}
+
+	const entry = changeMap.get(groupId);
+	entry.types.add(occurrence.type || "insert");
+	entry.count += 1;
+
+	if (
+		occurrence.snippet &&
+		!entry.snippets.includes(occurrence.snippet) &&
+		entry.snippets.length < 3
+	) {
+		entry.snippets.push(occurrence.snippet);
+	}
+}
+
+function walkTrackedChanges(node, changeMap) {
+	if (!node || typeof node !== "object") {
+		return;
+	}
+
+	const nodeChange = node.attrs?.trackedChange;
+
+	if (nodeChange?.groupId) {
+		pushChangeOccurrence(changeMap, nodeChange.groupId, {
+			type: nodeChange.type,
+			snippet: getNodeLabel(node),
+		});
+	}
+
+	if (node.type === "text" && Array.isArray(node.marks)) {
+		node.marks
+			.filter((mark) => mark.type === "trackedChange" && mark.attrs?.groupId)
+			.forEach((mark) => {
+				pushChangeOccurrence(changeMap, mark.attrs.groupId, {
+					type: mark.attrs.type,
+					snippet: truncateText(node.text),
+				});
+			});
+	}
+
+	if (Array.isArray(node.content)) {
+		node.content.forEach((child) => walkTrackedChanges(child, changeMap));
+	}
+}
+
+function collectReviewChanges(reviewDoc) {
+	const changeMap = new Map();
+
+	walkTrackedChanges(reviewDoc, changeMap);
+
+	return Array.from(changeMap.values())
+		.map((item) => {
+			const types = Array.from(item.types);
+			const type =
+				types.includes("insert") && types.includes("delete")
+					? "replace"
+					: types[0] || "insert";
+
+			return {
+				groupId: item.groupId,
+				type,
+				typeLabel:
+					type === "replace"
+						? "Replace"
+						: type === "delete"
+							? "Delete"
+							: "Insert",
+				summary: item.snippets.join(" / ") || "Tracked change",
+				fragmentCount: item.count,
+				order: item.order,
+			};
+		})
+		.sort((a, b) => a.order - b.order);
+}
+
+function syncReviewState(reviewDoc) {
+	reviewContent.value = reviewDoc;
+	reviewChanges.value = collectReviewChanges(reviewDoc);
+}
+
 function runCompare() {
 	const sourceEditor = sourceEditorRef.value?.editor?.();
 	const targetEditor = targetEditorRef.value?.editor?.();
@@ -183,11 +310,22 @@ function runCompare() {
 	const targetJson = targetEditor.getJSON();
 	const result = computeDiff(sourceJson, targetJson);
 
-	reviewContent.value = result.reviewDoc;
+	syncReviewState(result.reviewDoc);
 
 	console.log("source", sourceJson);
 	console.log("target", targetJson);
 	console.log("diff", result);
+}
+
+function applyReviewChange(groupId, action) {
+	const reviewEditor = reviewEditorRef.value?.editor?.();
+
+	if (!reviewEditor || !groupId) {
+		return;
+	}
+
+	applyTrackedGroup(reviewEditor, groupId, action);
+	syncReviewState(reviewEditor.getJSON());
 }
 
 onMounted(() => {
@@ -199,7 +337,7 @@ onMounted(() => {
 
 <div class="snapshot-compare-demo">
 <div class="snapshot-compare-toolbar">
-<fv-button style="width: 120px;" @click="runCompare">Run Compare</fv-button>
+<fv-button border-radius="6" style="width: 120px;" @click="runCompare">Run Compare</fv-button>
 <span>The final review editor below is rendered from <code>index.js</code>.</span>
 </div>
 
@@ -233,7 +371,10 @@ style="width: 100%;"
 
 <div class="snapshot-compare-review">
 <h2>Review Result</h2>
+<div class="snapshot-compare-review-layout">
+<div class="snapshot-compare-review-editor">
 <power-editor
+ref="reviewEditorRef"
 :model-value="reviewContent"
 :theme="viteData.isDark.value ? 'dark' : 'light'"
 :editable="false"
@@ -241,6 +382,50 @@ style="width: 100%;"
 foreground="#1d4ed8"
 style="width: 100%;"
 ></power-editor>
+</div>
+
+<aside class="snapshot-compare-review-sidebar">
+<div class="snapshot-compare-review-sidebar-header">
+<h3>Pending Changes</h3>
+<span>{{ reviewChanges.length }}</span>
+</div>
+
+<div v-if="reviewChanges.length" class="snapshot-compare-change-list">
+<div
+v-for="change in reviewChanges"
+:key="change.groupId"
+class="snapshot-compare-change-item"
+>
+<div class="snapshot-compare-change-meta">
+<span
+class="snapshot-compare-change-badge"
+:class="`__${change.type}`"
+>{{ change.typeLabel }}</span>
+<span class="snapshot-compare-change-count">{{ change.fragmentCount }} fragment(s)</span>
+</div>
+<p class="snapshot-compare-change-summary">{{ change.summary }}</p>
+<div class="snapshot-compare-change-actions">
+<fv-button
+:theme="'dark'"
+background="rgba(0, 204, 153, 1)"
+border-radius="6"
+@click="applyReviewChange(change.groupId, 'accept')"
+>Accept</fv-button>
+<fv-button
+:theme="'dark'"
+background="rgba(200, 38, 45, 1)"
+border-radius="6"
+@click="applyReviewChange(change.groupId, 'reject')"
+>Reject</fv-button>
+</div>
+</div>
+</div>
+
+<div v-else class="snapshot-compare-change-empty">
+All tracked changes in the review editor have been handled.
+</div>
+</aside>
+</div>
 </div>
 </div>
 
@@ -250,13 +435,20 @@ style="width: 100%;"
 <script setup>
 import { ref } from "vue";
 import { computeDiff } from "@/packages/editor/src/js/diffTool/index.js";
+import { applyTrackedGroup } from "@/packages/editor/src/js/diffTool/apply.js";
 
 const sourceEditorRef = ref(null);
 const targetEditorRef = ref(null);
+const reviewEditorRef = ref(null);
 const reviewContent = ref({
     type: "doc",
     content: [],
 });
+const reviewChanges = ref([]);
+
+function collectReviewChanges(reviewDoc) {
+    return [];
+}
 
 function compareSnapshots() {
     const sourceJson = sourceEditorRef.value?.editor?.()?.getJSON();
@@ -264,15 +456,26 @@ function compareSnapshots() {
     const result = computeDiff(sourceJson, targetJson);
 
     reviewContent.value = result.reviewDoc;
-    console.log(result);
+    reviewChanges.value = collectReviewChanges(result.reviewDoc);
+}
+
+function applyChange(groupId, action) {
+    const editor = reviewEditorRef.value?.editor?.();
+
+    if (!editor) return;
+
+    applyTrackedGroup(editor, groupId, action);
+    reviewContent.value = editor.getJSON();
+    reviewChanges.value = collectReviewChanges(reviewContent.value);
 }
 </script>
 
 <template>
     <power-editor ref="sourceEditorRef" :model-value="sourceContent"></power-editor>
     <power-editor ref="targetEditorRef" :model-value="targetContent"></power-editor>
-    <power-editor :model-value="reviewContent" :editable="false" :showToolBar="false"></power-editor>
+    <power-editor ref="reviewEditorRef" :model-value="reviewContent" :editable="false" :showToolBar="false"></power-editor>
     <fv-button @click="compareSnapshots">Compare</fv-button>
+    <fv-button @click="applyChange(reviewChanges[0]?.groupId, 'accept')">Accept First Change</fv-button>
 </template>
 ```
 
@@ -318,9 +521,112 @@ function compareSnapshots() {
 	padding: 20px;
 }
 
+.snapshot-compare-review-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 280px;
+	gap: 16px;
+	align-items: start;
+}
+
 .snapshot-compare-panel h2,
 .snapshot-compare-review h2 {
 	margin-top: 0;
+}
+
+.snapshot-compare-review-sidebar {
+	padding: 14px;
+	border-radius: 14px;
+	border: 1px solid var(--vp-c-divider);
+	background: var(--vp-c-bg);
+}
+
+.snapshot-compare-review-sidebar-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.snapshot-compare-review-sidebar-header h3 {
+	margin: 0;
+	font-size: 14px;
+}
+
+.snapshot-compare-review-sidebar-header span {
+	font-size: 12px;
+	color: var(--vp-c-text-2);
+}
+
+.snapshot-compare-change-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-height: 360px;
+	overflow: auto;
+}
+
+.snapshot-compare-change-item {
+	padding: 12px;
+	border-radius: 12px;
+	border: 1px solid var(--vp-c-divider);
+	background: var(--vp-c-bg-soft);
+}
+
+.snapshot-compare-change-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+.snapshot-compare-change-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.snapshot-compare-change-badge.__insert {
+	background: rgba(34, 197, 94, 0.14);
+	color: #15803d;
+}
+
+.snapshot-compare-change-badge.__delete {
+	background: rgba(239, 68, 68, 0.14);
+	color: #b91c1c;
+}
+
+.snapshot-compare-change-badge.__replace {
+	background: rgba(59, 130, 246, 0.14);
+	color: #1d4ed8;
+}
+
+.snapshot-compare-change-count {
+	font-size: 12px;
+	color: var(--vp-c-text-2);
+}
+
+.snapshot-compare-change-summary {
+	margin: 0 0 10px;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--vp-c-text-1);
+	word-break: break-word;
+}
+
+.snapshot-compare-change-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.snapshot-compare-change-empty {
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--vp-c-text-2);
 }
 
 .snapshot-compare-review :deep(.tip-tap-editor) {
@@ -329,6 +635,10 @@ function compareSnapshots() {
 
 @media (max-width: 1200px) {
 	.snapshot-compare-grid.__three {
+		grid-template-columns: 1fr;
+	}
+
+	.snapshot-compare-review-layout {
 		grid-template-columns: 1fr;
 	}
 }
