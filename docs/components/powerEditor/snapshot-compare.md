@@ -233,38 +233,38 @@ function pushChangeOccurrence(changeMap, groupId, occurrence) {
 	}
 }
 
-function walkTrackedChanges(node, changeMap) {
-	if (!node || typeof node !== "object") {
-		return;
-	}
-
-	const nodeChange = node.attrs?.trackedChange;
-
-	if (nodeChange?.groupId) {
-		pushChangeOccurrence(changeMap, nodeChange.groupId, {
-			type: nodeChange.type,
-			snippet: getNodeLabel(node),
-		});
-	}
-
-	if (node.type === "text" && Array.isArray(node.marks)) {
-		node.marks
-			.filter((mark) => mark.type === "trackedChange" && mark.attrs?.groupId)
-			.forEach((mark) => {
-				pushChangeOccurrence(changeMap, mark.attrs.groupId, {
-					type: mark.attrs.type,
-					snippet: truncateText(node.text),
-				});
-			});
-	}
-
-	if (Array.isArray(node.content)) {
-		node.content.forEach((child) => walkTrackedChanges(child, changeMap));
-	}
-}
-
 function collectReviewChanges(reviewDoc) {
 	const changeMap = new Map();
+
+    function walkTrackedChanges(node, changeMap) {
+        if (!node || typeof node !== "object") {
+            return;
+        }
+
+        const nodeChange = node.attrs?.trackedChange;
+
+        if (nodeChange?.groupId) {
+            pushChangeOccurrence(changeMap, nodeChange.groupId, {
+                type: nodeChange.type,
+                snippet: getNodeLabel(node),
+            });
+        }
+
+        if (node.type === "text" && Array.isArray(node.marks)) {
+            node.marks
+                .filter((mark) => mark.type === "trackedChange" && mark.attrs?.groupId)
+                .forEach((mark) => {
+                    pushChangeOccurrence(changeMap, mark.attrs.groupId, {
+                        type: mark.attrs.type,
+                        snippet: node.text.slice(0, 48),
+                    });
+                });
+        }
+
+        if (Array.isArray(node.content)) {
+            node.content.forEach((child) => walkTrackedChanges(child, changeMap));
+        }
+    }
 
 	walkTrackedChanges(reviewDoc, changeMap);
 
@@ -325,7 +325,11 @@ function applyReviewChange(groupId, action) {
 	}
 
 	applyTrackedGroup(reviewEditor, groupId, action);
-	syncReviewState(reviewEditor.getJSON());
+    for(let i = reviewChanges.value.length - 1; i >= 0; i--) {
+        if (reviewChanges.value[i].groupId === groupId) {
+            reviewChanges.value.splice(i, 1);
+        }
+    }
 }
 
 onMounted(() => {
