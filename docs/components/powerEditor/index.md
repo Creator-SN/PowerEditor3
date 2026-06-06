@@ -73,6 +73,7 @@ const exportMarkdown = async () => {
 - [图像注入优化](./image-paste-drop)
 - [MentionItem](./mention-item)
 - [Markdown Decoder Plugins](./markdown-decoder-plugins)
+- [Snapshot Compare](./snapshot-compare)
 
 ## Props
 

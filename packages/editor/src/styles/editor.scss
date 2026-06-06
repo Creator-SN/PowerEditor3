@@ -113,6 +113,22 @@
                 cursor: pointer;
             }
 
+            .tracked-change {
+                border-radius: 4px;
+                transition: background-color 0.2s ease, opacity 0.2s ease;
+            }
+
+            .tracked-change-insert {
+                background: rgba(34, 197, 94, 0.18);
+                box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.28);
+            }
+
+            .tracked-change-delete {
+                background: rgba(239, 68, 68, 0.14);
+                box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.24);
+                text-decoration: line-through;
+            }
+
             p {
                 color: #2c3e50;
 
@@ -362,7 +378,7 @@
         }
     }
 
-    &.dark {
+	&.dark {
         background: rgba(47, 52, 55, 1);
 
         .power-editor-tool-bar-acrylic-background {
@@ -377,6 +393,16 @@
         }
 
         .ProseMirror {
+            .tracked-change-insert {
+                background: rgba(74, 222, 128, 0.22);
+                box-shadow: inset 0 0 0 1px rgba(74, 222, 128, 0.3);
+            }
+
+            .tracked-change-delete {
+                background: rgba(248, 113, 113, 0.18);
+                box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.28);
+            }
+
             p,
             h1,
             h2,

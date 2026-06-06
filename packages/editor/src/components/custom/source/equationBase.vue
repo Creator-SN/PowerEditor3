@@ -7,6 +7,9 @@
 			dark: thisTheme === 'dark',
 			div: node.attrs.tag == 'div',
 			selected: selected,
+			'tracked-change': !!node.attrs.trackedChange,
+			[`tracked-change-${node.attrs.trackedChange?.type}`]:
+				!!node.attrs.trackedChange?.type,
 		}"
 		:style="{ '--selected-bg': focusForeground }"
 	>

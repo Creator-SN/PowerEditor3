@@ -2,6 +2,10 @@ import { Node, mergeAttributes, nodeInputRule } from '@tiptap/core';
 import { VueNodeViewRenderer } from '@tiptap/vue-3';
 import inlineEquation from '../source/equationBase.vue';
 import { nodePasteRule } from '../pasteRules/nodePasteRules';
+import {
+    buildTrackedChangeNodeAttribute,
+    getTrackedChangeClassName,
+} from './trackedChange.js';
 
 // 检测是否正在输入数学表达式（以 $ 或 \( 结尾）
 const inputRegex = /(\$\s|\\\(\s)$/;
@@ -35,7 +39,8 @@ export default Node.create({
             },
             showPopper: {
                 default: false,
-            }
+            },
+            trackedChange: buildTrackedChangeNodeAttribute(),
         };
     },
 
@@ -48,7 +53,16 @@ export default Node.create({
     },
 
     renderHTML({ HTMLAttributes }) {
-        return ['inline-equation', mergeAttributes(HTMLAttributes)];
+        const trackedClassName = getTrackedChangeClassName(
+            HTMLAttributes.trackedChange,
+        );
+
+        return [
+            'inline-equation',
+            mergeAttributes(HTMLAttributes, {
+                class: trackedClassName || undefined,
+            }),
+        ];
     },
 
     addNodeView() {

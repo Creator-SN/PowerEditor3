@@ -327,6 +327,7 @@ import EquationBlock from "./components/custom/extension/equationBlock.js";
 import MentionItem from "./components/custom/extension/mentionItem.js";
 import DrawingBlock from "./components/custom/extension/drawingBlock.js";
 import FormatPainter from "./components/custom/extension/formatPainter.js";
+import { TrackedChange } from "./components/custom/extension/trackedChange.js";
 
 import toolBar from "./components/toolBar.vue";
 import bubbleToolBar from "./components/bubbleToolBar.vue";
@@ -429,6 +430,7 @@ export default {
 				EquationBlock,
 				MentionItem,
 				DrawingBlock,
+				TrackedChange,
 				Table.configure({
 					HTMLAttributes: {},
 					resizable: true,
