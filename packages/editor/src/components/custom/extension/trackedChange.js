@@ -180,6 +180,8 @@ export const TrackedChangeNodeAttributes = Extension.create({
                     "tableCell",
                     "bulletList",
                     "orderedList",
+                    "blockquote",
+                    "horizontalRule",
                     "details",
                     "detailsContent",
                     "detailsSummary",

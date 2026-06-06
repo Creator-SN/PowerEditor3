@@ -43,9 +43,13 @@
         --table-drag-color: rgba(145, 191, 209, 1);
         --code-color: rgba(235, 87, 87, 1);
         --tracked-change-insert-color: rgba(34, 197, 94, 0.18);
+        --tracked-change-insert-color-sec: rgba(34, 197, 94, 0.3);
         --tracked-change-insert-hover-color: rgba(34, 197, 94, 0.2);
+        --tracked-change-insert-hover-color-sec: rgba(34, 197, 94, 0.6);
         --tracked-change-delete-color: rgba(235, 87, 87, 0.3);
+        --tracked-change-delete-color-sec: rgba(235, 87, 87, 0.35);
         --tracked-change-delete-hover-color: rgba(235, 87, 87, 0.35);
+        --tracked-change-delete-hover-color-sec: rgba(235, 87, 87, 0.6);
 
         &.read-only {
             padding-top: 5px;
@@ -118,7 +122,6 @@
             }
 
             .tracked-change {
-                border-radius: 4px;
                 transition:
                     background-color 0.2s ease,
                     opacity 0.2s ease;
@@ -126,24 +129,35 @@
 
             .tracked-change-insert {
                 background: var(--tracked-change-insert-color);
-                box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.28);
+                border-bottom: 3px solid var(--tracked-change-insert-color-sec);
 
                 &:hover {
                     background: var(--tracked-change-insert-hover-color);
+                    border-bottom: 3px solid var(--tracked-change-insert-hover-color-sec);
+                }
+
+                &:active {
+                    opacity: 0.9;
                 }
             }
 
             .tracked-change-delete {
                 background: var(--tracked-change-delete-color);
-                box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.24);
                 text-decoration: line-through;
+                text-decoration-color: var(--tracked-change-delete-color-sec);
 
                 &:hover {
                     background: var(--tracked-change-delete-hover-color);
+                    text-decoration-color: var(--tracked-change-delete-hover-color-sec);
+                }
+
+                &:active {
+                    opacity: 0.9;
                 }
             }
 
             p {
+                margin: 0px;
                 color: #2c3e50;
 
                 &.is-editor-empty {
