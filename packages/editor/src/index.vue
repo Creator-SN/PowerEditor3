@@ -94,6 +94,16 @@
 				'--selection-color': selectionForeground,
 				'--table-drag-color': tableDragColor,
 				'--code-color': codeColor,
+				'--tracked-change-insert-color': diffInsertColor,
+				'--tracked-change-insert-color-sec': diffInsertColorSec,
+				'--tracked-change-delete-color': diffDeleteColor,
+				'--tracked-change-delete-color-sec': diffDeleteColorSec,
+				'--tracked-change-insert-hover-color': diffInsertHoverColor,
+				'--tracked-change-delete-hover-color': diffDeleteHoverColor,
+				'--tracked-change-insert-hover-color-sec':
+					diffInsertHoverColorSec,
+				'--tracked-change-delete-hover-color-sec':
+					diffDeleteHoverColorSec,
 			}"
 		>
 			<slot name="front-content"></slot>
@@ -282,6 +292,30 @@ const props = defineProps({
 	diffContainerBlockTypes: {
 		default: () => [],
 		type: Array,
+	},
+	diffInsertColor: {
+		default: "",
+	},
+	diffDeleteColor: {
+		default: "",
+	},
+	diffInsertColorSec: {
+		default: "",
+	},
+	diffDeleteColorSec: {
+		default: "",
+	},
+	diffInsertHoverColor: {
+		default: "",
+	},
+	diffDeleteHoverColor: {
+		default: "",
+	},
+	diffInsertHoverColorSec: {
+		default: "",
+	},
+	diffDeleteHoverColorSec: {
+		default: "",
 	},
 	language: {
 		default: "cn",
