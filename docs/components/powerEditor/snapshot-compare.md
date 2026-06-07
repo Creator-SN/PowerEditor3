@@ -8,6 +8,40 @@ This page demonstrates a snapshot compare flow for `power-editor`.
 4. Compute diff with `computeDiff()` or `diffTool.compareDiff()`.
 5. Render the final review result in another `power-editor`.
 
+## 说明 / Overview
+
+`Snapshot Compare` 用于把两个编辑器快照转换为可审阅的差异结果，适合版本预览、草稿校对、审批确认和变更回放。
+
+`Snapshot Compare` turns two editor snapshots into a review-ready diff result. It is useful for version previews, draft review, approval flows, and change playback.
+
+## 主编辑器中的 Diff Props / Diff Props On `<power-editor>`
+
+下面这些属性已经在主编辑器 `power-editor` 上可直接使用，既可以用于本页示例，也可以用于你自己的审阅页面。
+
+The following props are available directly on `power-editor`. They work both for this demo and for your own review UIs.
+
+| Prop | Type | Default | 中文说明 | English |
+| :-- | :-- | :-- | :-- | :-- |
+| `diffInlineBlockTypes` | `string[]` | `[]` | 扩展按“行内内容 diff”处理的块级节点类型。适合外观像块节点、但内容仍应逐段比较的自定义节点。 | Extends block node types that should still be diffed like inline content. Useful for custom block-looking nodes whose inner fragments should be compared inline. |
+| `diffContainerBlockTypes` | `string[]` | `[]` | 扩展按“容器节点 diff”处理的块级节点类型。适合包装器、布局容器、多子节点结构。 | Extends block node types that should be handled as diff containers, such as wrappers, layout containers, or nested custom structures. |
+| `diffInsertColor` | `string` | `""` | 插入变更主色。 | Primary color for inserted changes. |
+| `diffDeleteColor` | `string` | `""` | 删除变更主色。 | Primary color for deleted changes. |
+| `diffInsertColorSec` | `string` | `""` | 插入变更辅助色，常用于边框或装饰。 | Secondary accent for inserted changes, usually for borders or decoration. |
+| `diffDeleteColorSec` | `string` | `""` | 删除变更辅助色。 | Secondary accent for deleted changes. |
+| `diffInsertHoverColor` | `string` | `""` | 鼠标移入插入变更时的高亮色。 | Hover highlight color for inserted changes. |
+| `diffDeleteHoverColor` | `string` | `""` | 鼠标移入删除变更时的高亮色。 | Hover highlight color for deleted changes. |
+| `diffInsertHoverColorSec` | `string` | `""` | 插入变更 hover 状态的辅助色。 | Secondary hover accent for inserted changes. |
+| `diffDeleteHoverColorSec` | `string` | `""` | 删除变更 hover 状态的辅助色。 | Secondary hover accent for deleted changes. |
+
+### 推荐场景 / Recommended Usage
+
+- 自定义段落类节点时，优先补充到 `diffInlineBlockTypes`。
+- 自定义容器、卡片、布局块时，优先补充到 `diffContainerBlockTypes`。
+- 如果你的审阅界面有品牌色或深浅主题切换，建议同时配置普通态和 hover 态颜色。
+- When you introduce custom paragraph-like nodes, start with `diffInlineBlockTypes`.
+- When you introduce custom containers, cards, or layout wrappers, start with `diffContainerBlockTypes`.
+- If your review UI has brand colors or light/dark themes, configure both base and hover colors together.
+
 <script setup>
 import { nextTick, onMounted, ref } from "vue";
 import { useData } from "vitepress";

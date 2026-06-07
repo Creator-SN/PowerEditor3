@@ -116,6 +116,16 @@ const exportMarkdown = async () => {
 | `showDragHandler` | `boolean` | 否 | `false` | 是否显示块级拖拽手柄。 |
 | `ignoreDragNodeType` | `array` | 否 | `[]` | 忽略显示拖拽手柄的节点类型列表。 |
 | `dragHandlerNested` | `boolean` | 否 | `false` | 是否允许拖拽手柄在嵌套块节点中工作。 |
+| `diffInlineBlockTypes` | `string[]` | 否 | `[]` | 扩展按“行内内容 diff”处理的块级节点类型。适合外观像块节点、但内容仍应逐段比较的自定义节点。 |
+| `diffContainerBlockTypes` | `string[]` | 否 | `[]` | 扩展按“容器节点 diff”处理的块级节点类型。适合包装器、布局容器、多子节点结构。 |
+| `diffInsertColor` | `string` | 否 | `""` | 插入变更主色，用于渲染新增内容的基础高亮。 |
+| `diffDeleteColor` | `string` | 否 | `""` | 删除变更主色，用于渲染删除内容的基础高亮。 |
+| `diffInsertColorSec` | `string` | 否 | `""` | 插入变更辅助色，常用于边框、渐变或附加装饰。 |
+| `diffDeleteColorSec` | `string` | 否 | `""` | 删除变更辅助色，常用于边框、渐变或附加装饰。 |
+| `diffInsertHoverColor` | `string` | 否 | `""` | 鼠标移入插入变更时的高亮色。 |
+| `diffDeleteHoverColor` | `string` | 否 | `""` | 鼠标移入删除变更时的高亮色。 |
+| `diffInsertHoverColorSec` | `string` | 否 | `""` | 插入变更 hover 状态的辅助色。 |
+| `diffDeleteHoverColorSec` | `string` | 否 | `""` | 删除变更 hover 状态的辅助色。 |
 
 ## Events
 
@@ -242,6 +252,10 @@ const exportMarkdown = async () => {
 | `editor.saveMarkdown()` | 将当前编辑器内容转换为 Markdown。 |
 | `editor.computeMarkdown(markdown)` | 将 Markdown 字符串解析为编辑器内容。 |
 | `editor.insertMarkdown(markdown)` | 在当前位置插入 Markdown 内容。 |
+
+| `editor.compareDiff(sourceDoc, targetDoc)` | 调用组件内置 diff 入口，返回与 `computeDiff()` 一致的对比结果结构。 |
+| `editor.editor()` | 返回当前 Tiptap editor 实例，便于继续调用 `getJSON()`、`commands` 等底层能力。 |
+| `editor.focus()` | 将焦点移入编辑器。 |
 
 ## Slots
 
