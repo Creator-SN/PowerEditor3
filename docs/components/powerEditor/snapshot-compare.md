@@ -1,46 +1,39 @@
-# Snapshot Compare
+# 快照对比
 
-This page demonstrates a snapshot compare flow for `power-editor`.
+本页演示 `power-editor` 的快照对比流程。
 
-1. Prepare two Tiptap JSON documents.
-2. Render them with `power-editor`.
-3. Call `getJSON()` on source and target.
-4. Compute diff with `computeDiff()` or `diffTool.compareDiff()`.
-5. Render the final review result in another `power-editor`.
+1. 准备两份 Tiptap JSON 文档。
+2. 分别用 `power-editor` 渲染源文档和目标文档。
+3. 通过 `getJSON()` 读取两边编辑器内容。
+4. 使用 `computeDiff()` 或 `diffTool.compareDiff()` 计算差异。
+5. 将最终审阅结果渲染到另一个 `power-editor` 中。
 
-## 说明 / Overview
+## 说明
 
-`Snapshot Compare` 用于把两个编辑器快照转换为可审阅的差异结果，适合版本预览、草稿校对、审批确认和变更回放。
+快照对比用于把两个编辑器快照转换为可审阅的差异结果，适合版本预览、草稿校对、审批确认和变更回放。
 
-`Snapshot Compare` turns two editor snapshots into a review-ready diff result. It is useful for version previews, draft review, approval flows, and change playback.
-
-## 主编辑器中的 Diff Props / Diff Props On `<power-editor>`
+## 主编辑器中的 Diff Props
 
 下面这些属性已经在主编辑器 `power-editor` 上可直接使用，既可以用于本页示例，也可以用于你自己的审阅页面。
 
-The following props are available directly on `power-editor`. They work both for this demo and for your own review UIs.
+| 属性 | 类型 | 默认值 | 说明 |
+| :-- | :-- | :-- | :-- |
+| `diffInlineBlockTypes` | `string[]` | `[]` | 扩展按“行内内容 diff”处理的块级节点类型。适合外观像块节点、但内容仍应逐段比较的自定义节点。 |
+| `diffContainerBlockTypes` | `string[]` | `[]` | 扩展按“容器节点 diff”处理的块级节点类型。适合包装器、布局容器、多子节点结构。 |
+| `diffInsertColor` | `string` | `""` | 插入变更主色。 |
+| `diffDeleteColor` | `string` | `""` | 删除变更主色。 |
+| `diffInsertColorSec` | `string` | `""` | 插入变更辅助色，常用于边框或装饰。 |
+| `diffDeleteColorSec` | `string` | `""` | 删除变更辅助色。 |
+| `diffInsertHoverColor` | `string` | `""` | 鼠标移入插入变更时的高亮色。 |
+| `diffDeleteHoverColor` | `string` | `""` | 鼠标移入删除变更时的高亮色。 |
+| `diffInsertHoverColorSec` | `string` | `""` | 插入变更 hover 状态的辅助色。 |
+| `diffDeleteHoverColorSec` | `string` | `""` | 删除变更 hover 状态的辅助色。 |
 
-| Prop | Type | Default | 中文说明 | English |
-| :-- | :-- | :-- | :-- | :-- |
-| `diffInlineBlockTypes` | `string[]` | `[]` | 扩展按“行内内容 diff”处理的块级节点类型。适合外观像块节点、但内容仍应逐段比较的自定义节点。 | Extends block node types that should still be diffed like inline content. Useful for custom block-looking nodes whose inner fragments should be compared inline. |
-| `diffContainerBlockTypes` | `string[]` | `[]` | 扩展按“容器节点 diff”处理的块级节点类型。适合包装器、布局容器、多子节点结构。 | Extends block node types that should be handled as diff containers, such as wrappers, layout containers, or nested custom structures. |
-| `diffInsertColor` | `string` | `""` | 插入变更主色。 | Primary color for inserted changes. |
-| `diffDeleteColor` | `string` | `""` | 删除变更主色。 | Primary color for deleted changes. |
-| `diffInsertColorSec` | `string` | `""` | 插入变更辅助色，常用于边框或装饰。 | Secondary accent for inserted changes, usually for borders or decoration. |
-| `diffDeleteColorSec` | `string` | `""` | 删除变更辅助色。 | Secondary accent for deleted changes. |
-| `diffInsertHoverColor` | `string` | `""` | 鼠标移入插入变更时的高亮色。 | Hover highlight color for inserted changes. |
-| `diffDeleteHoverColor` | `string` | `""` | 鼠标移入删除变更时的高亮色。 | Hover highlight color for deleted changes. |
-| `diffInsertHoverColorSec` | `string` | `""` | 插入变更 hover 状态的辅助色。 | Secondary hover accent for inserted changes. |
-| `diffDeleteHoverColorSec` | `string` | `""` | 删除变更 hover 状态的辅助色。 | Secondary hover accent for deleted changes. |
-
-### 推荐场景 / Recommended Usage
+### 推荐场景
 
 - 自定义段落类节点时，优先补充到 `diffInlineBlockTypes`。
 - 自定义容器、卡片、布局块时，优先补充到 `diffContainerBlockTypes`。
 - 如果你的审阅界面有品牌色或深浅主题切换，建议同时配置普通态和 hover 态颜色。
-- When you introduce custom paragraph-like nodes, start with `diffInlineBlockTypes`.
-- When you introduce custom containers, cards, or layout wrappers, start with `diffContainerBlockTypes`.
-- If your review UI has brand colors or light/dark themes, configure both base and hover colors together.
 
 <script setup>
 import { nextTick, onMounted, ref } from "vue";
@@ -69,7 +62,7 @@ const sourceContent = ref({
 			content: [
 				{
 					type: "text",
-					text: "Snapshot Compare Overview",
+					text: "快照对比概览",
 				},
 			],
 		},
@@ -81,7 +74,7 @@ const sourceContent = ref({
 			content: [
 				{
 					type: "text",
-					text: "This source snapshot keeps the original editor structure before changes.",
+					text: "这份源快照保留了变更前的原始编辑器结构。",
 				},
 			],
 		},
@@ -96,7 +89,7 @@ const sourceContent = ref({
 							content: [
 								{
 									type: "text",
-									text: "Export editor state with getJSON()",
+									text: "使用 getJSON() 导出编辑器状态",
 								},
 							],
 						},
@@ -110,7 +103,7 @@ const sourceContent = ref({
 							content: [
 								{
 									type: "text",
-									text: "Keep heading and paragraph nodes",
+									text: "保留标题与段落节点",
 								},
 							],
 						},
@@ -132,7 +125,7 @@ const targetContent = ref({
 			content: [
 				{
 					type: "text",
-					text: "Snapshot Compare Overview",
+					text: "快照对比概览",
 				},
 			],
 		},
@@ -144,7 +137,7 @@ const targetContent = ref({
 			content: [
 				{
 					type: "text",
-					text: "This target snapshot keeps the updated editor structure after changes.",
+					text: "这份目标快照保留了变更后的编辑器结构。",
 				},
 				{
 					type: "inlineEquation",
@@ -152,7 +145,7 @@ const targetContent = ref({
 						value: "A_a",
 						tag: "span",
 						placeholder: "Y=WX^T+b",
-						emptyPlaceholder: "New Equation",
+						emptyPlaceholder: "新建公式",
 						showPopper: false,
 					},
 				},
@@ -169,7 +162,7 @@ const targetContent = ref({
 							content: [
 								{
 									type: "text",
-									text: "Export editor state with getJSON()",
+									text: "使用 getJSON() 导出编辑器状态",
 								},
 							],
 						},
@@ -183,7 +176,7 @@ const targetContent = ref({
 							content: [
 								{
 									type: "text",
-									text: "Keep heading and paragraph nodes",
+									text: "保留标题与段落节点",
 								},
 							],
 						},
@@ -197,7 +190,7 @@ const targetContent = ref({
 							content: [
 								{
 									type: "text",
-									text: "Add a new snapshot compare debug entry",
+									text: "新增一条快照对比调试记录",
 								},
 							],
 						},
@@ -222,21 +215,21 @@ function truncateText(text = "", max = 48) {
 
 function getNodeLabel(node = {}) {
 	const labels = {
-		paragraph: "Paragraph",
-		heading: "Heading",
-		bulletList: "Bullet List",
-		orderedList: "Ordered List",
-		listItem: "List Item",
-		blockquote: "Blockquote",
-		codeBlock: "Code Block",
-		inlineEquation: "Inline Equation",
-		equationBlock: "Equation Block",
-		imageblock: "Image",
-		mentionItem: "Mention",
-		powerTaskItem: "Task Item",
+		paragraph: "段落",
+		heading: "标题",
+		bulletList: "无序列表",
+		orderedList: "有序列表",
+		listItem: "列表项",
+		blockquote: "引用块",
+		codeBlock: "代码块",
+		inlineEquation: "行内公式",
+		equationBlock: "公式块",
+		imageblock: "图片",
+		mentionItem: "提及项",
+		powerTaskItem: "任务项",
 	};
 
-	return labels[node.type] || node.type || "Node";
+	return labels[node.type] || node.type || "节点";
 }
 
 function pushChangeOccurrence(changeMap, groupId, occurrence) {
@@ -315,11 +308,11 @@ function collectReviewChanges(reviewDoc) {
 				type,
 				typeLabel:
 					type === "replace"
-						? "Replace"
+						? "替换"
 						: type === "delete"
-							? "Delete"
-							: "Insert",
-				summary: item.snippets.join(" / ") || "Tracked change",
+							? "删除"
+							: "插入",
+				summary: item.snippets.join(" / ") || "跟踪变更",
 				fragmentCount: item.count,
 				order: item.order,
 			};
@@ -375,13 +368,13 @@ onMounted(() => {
 
 <div class="snapshot-compare-demo">
 <div class="snapshot-compare-toolbar">
-<fv-button border-radius="6" style="width: 120px;" @click="runCompare">Run Compare</fv-button>
-<span>The final review editor below is rendered from <code>index.js</code>.</span>
+<fv-button border-radius="6" style="width: 120px;" @click="runCompare">运行对比</fv-button>
+<span>下方最终审阅编辑器由 <code>index.js</code> 生成结果后渲染。</span>
 </div>
 
 <div class="snapshot-compare-grid __three">
 <div class="snapshot-compare-panel">
-<h2>Source Snapshot</h2>
+<h2>源快照</h2>
 <power-editor
 ref="sourceEditorRef"
 :model-value="sourceContent"
@@ -394,7 +387,7 @@ style="width: 100%;"
 </div>
 
 <div class="snapshot-compare-panel">
-<h2>Target Snapshot</h2>
+<h2>目标快照</h2>
 <power-editor
 ref="targetEditorRef"
 :model-value="targetContent"
@@ -408,7 +401,7 @@ style="width: 100%;"
 </div>
 
 <div class="snapshot-compare-review">
-<h2>Review Result</h2>
+<h2>审阅结果</h2>
 <div class="snapshot-compare-review-layout">
 <div class="snapshot-compare-review-editor">
 <power-editor
@@ -424,7 +417,7 @@ style="width: 100%;"
 
 <aside class="snapshot-compare-review-sidebar">
 <div class="snapshot-compare-review-sidebar-header">
-<h3>Pending Changes</h3>
+<h3>待处理变更</h3>
 <span>{{ reviewChanges.length }}</span>
 </div>
 
@@ -439,7 +432,7 @@ class="snapshot-compare-change-item"
 class="snapshot-compare-change-badge"
 :class="`__${change.type}`"
 >{{ change.typeLabel }}</span>
-<span class="snapshot-compare-change-count">{{ change.fragmentCount }} fragment(s)</span>
+<span class="snapshot-compare-change-count">{{ change.fragmentCount }} 个片段</span>
 </div>
 <p class="snapshot-compare-change-summary">{{ change.summary }}</p>
 <div class="snapshot-compare-change-actions">
@@ -448,39 +441,39 @@ class="snapshot-compare-change-badge"
 background="rgba(0, 204, 153, 1)"
 border-radius="6"
 @click="applyReviewChange(change.groupId, 'accept')"
->Accept</fv-button>
+>接受</fv-button>
 <fv-button
 :theme="'dark'"
 background="rgba(200, 38, 45, 1)"
 border-radius="6"
 @click="applyReviewChange(change.groupId, 'reject')"
->Reject</fv-button>
+>拒绝</fv-button>
 </div>
 </div>
 </div>
 
 <div v-else class="snapshot-compare-change-empty">
-All tracked changes in the review editor have been handled.
+审阅编辑器中的所有跟踪变更都已处理完成。
 </div>
 </aside>
 </div>
 </div>
 </div>
 
-## Example
+## 示例
 
-### In This Docs Repo
+### 在当前文档仓库中
 
-The live demo on this page imports the source files directly, because VitePress here is running inside the same repository:
+本页在线示例直接引用源码文件，因为这里的 VitePress 就运行在同一个仓库里：
 
 ```js
 import { computeDiff } from "@/packages/editor/src/js/diffTool/index.js";
 import { applyTrackedGroup } from "@/packages/editor/src/js/diffTool/apply.js";
 ```
 
-### After `yarn add @creatorsn/powereditor3`
+### 执行 `yarn add @creatorsn/powereditor3` 之后
 
-After publishing and installing from npm, do not import from the internal source path above. Import from the package root instead:
+发布到 npm 并安装后，不要再从上面的内部源码路径导入，而应该从包根入口导入：
 
 ```js
 import {
@@ -490,9 +483,9 @@ import {
 } from "@creatorsn/powereditor3";
 ```
 
-If you are only using the default compare flow, `computeDiff(sourceDoc, targetDoc)` is enough.
+如果你只使用默认的对比流程，那么 `computeDiff(sourceDoc, targetDoc)` 就够用了。
 
-If you want the configurable style, you can also write:
+如果你希望使用可配置写法，也可以这样写：
 
 ```js
 import { diffTool } from "@creatorsn/powereditor3";
@@ -505,9 +498,9 @@ const result = diffTool
     .compareDiff(sourceDoc, targetDoc);
 ```
 
-### Using Exposed Methods From `<power-editor>`
+### 使用 `<power-editor>` 暴露的方法
 
-`power-editor` also exposes `compareDiff()` on its component instance. So if you already have an editor ref and want to reuse the editor-level configuration entry, this is also supported:
+`power-editor` 组件实例同样暴露了 `compareDiff()`。如果你已经拿到了编辑器 `ref`，并且希望复用编辑器级别的配置入口，也可以直接这样调用：
 
 ```vue
 <script setup>
@@ -521,7 +514,7 @@ function compareWithEditor(sourceDoc, targetDoc) {
 </script>
 ```
 
-This page's main demo still uses the direct `computeDiff()` + `applyTrackedGroup()` flow because it makes the diff pipeline easier to read.
+本页主示例仍然使用直接调用 `computeDiff()` + `applyTrackedGroup()` 的方式，因为这样更便于看清整条 diff 处理链路。
 
 ```vue
 <script setup>
@@ -565,19 +558,19 @@ function applyChange(groupId, action) {
     <power-editor ref="sourceEditorRef" :model-value="sourceContent"></power-editor>
     <power-editor ref="targetEditorRef" :model-value="targetContent"></power-editor>
     <power-editor ref="reviewEditorRef" :model-value="reviewContent" :editable="false" :showToolBar="false"></power-editor>
-    <fv-button @click="compareSnapshots">Compare</fv-button>
-    <fv-button @click="applyChange(reviewChanges[0]?.groupId, 'accept')">Accept First Change</fv-button>
+    <fv-button @click="compareSnapshots">执行对比</fv-button>
+    <fv-button @click="applyChange(reviewChanges[0]?.groupId, 'accept')">接受第一条变更</fv-button>
 </template>
 ```
 
-## Notes
+## 说明事项
 
-- `model-value` in this demo uses Tiptap JSON documents instead of HTML strings.
-- Paragraph inline content now supports `text`, `hardBreak`, `inlineEquation` and other inline atoms.
-- `computeDiff()` returns both `chunks` and `reviewDoc`.
-- `diffTool.compareDiff()` returns the same result shape as `computeDiff()`.
-- `reviewDoc` can be rendered directly by `power-editor` as the final compare result.
-- `applyTrackedGroup()` can be imported from `@creatorsn/powereditor3` after package installation.
+- 本示例中的 `model-value` 使用的是 Tiptap JSON 文档，而不是 HTML 字符串。
+- 段落行内内容现在支持 `text`、`hardBreak`、`inlineEquation` 等多种行内原子节点。
+- `computeDiff()` 会同时返回 `chunks` 和 `reviewDoc`。
+- `diffTool.compareDiff()` 返回的数据结构与 `computeDiff()` 一致。
+- `reviewDoc` 可以直接交给 `power-editor` 渲染成最终对比结果。
+- 安装包之后，可以从 `@creatorsn/powereditor3` 直接导入 `applyTrackedGroup()`。
 
 <style scoped>
 .snapshot-compare-demo {
