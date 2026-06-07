@@ -5,7 +5,7 @@ This page demonstrates a snapshot compare flow for `power-editor`.
 1. Prepare two Tiptap JSON documents.
 2. Render them with `power-editor`.
 3. Call `getJSON()` on source and target.
-4. Import `computeDiff` from `packages/editor/src/js/diffTool/index.js`.
+4. Compute diff with `computeDiff()` or `diffTool.compareDiff()`.
 5. Render the final review result in another `power-editor`.
 
 <script setup>
@@ -435,11 +435,64 @@ All tracked changes in the review editor have been handled.
 
 ## Example
 
+### In This Docs Repo
+
+The live demo on this page imports the source files directly, because VitePress here is running inside the same repository:
+
+```js
+import { computeDiff } from "@/packages/editor/src/js/diffTool/index.js";
+import { applyTrackedGroup } from "@/packages/editor/src/js/diffTool/apply.js";
+```
+
+### After `yarn add @creatorsn/powereditor3`
+
+After publishing and installing from npm, do not import from the internal source path above. Import from the package root instead:
+
+```js
+import {
+    computeDiff,
+    diffTool,
+    applyTrackedGroup,
+} from "@creatorsn/powereditor3";
+```
+
+If you are only using the default compare flow, `computeDiff(sourceDoc, targetDoc)` is enough.
+
+If you want the configurable style, you can also write:
+
+```js
+import { diffTool } from "@creatorsn/powereditor3";
+
+const result = diffTool
+    .configure({
+        extendInlineDiffBlockTypes: ["customParagraphLike"],
+        extendContainerDiffBlockTypes: ["customContainerLike"],
+    })
+    .compareDiff(sourceDoc, targetDoc);
+```
+
+### Using Exposed Methods From `<power-editor>`
+
+`power-editor` also exposes `compareDiff()` on its component instance. So if you already have an editor ref and want to reuse the editor-level configuration entry, this is also supported:
+
 ```vue
 <script setup>
 import { ref } from "vue";
-import { computeDiff } from "@/packages/editor/src/js/diffTool/index.js";
-import { applyTrackedGroup } from "@/packages/editor/src/js/diffTool/apply.js";
+
+const reviewEditorRef = ref(null);
+
+function compareWithEditor(sourceDoc, targetDoc) {
+    return reviewEditorRef.value?.compareDiff?.(sourceDoc, targetDoc);
+}
+</script>
+```
+
+This page's main demo still uses the direct `computeDiff()` + `applyTrackedGroup()` flow because it makes the diff pipeline easier to read.
+
+```vue
+<script setup>
+import { ref } from "vue";
+import { computeDiff, applyTrackedGroup } from "@creatorsn/powereditor3";
 
 const sourceEditorRef = ref(null);
 const targetEditorRef = ref(null);
@@ -488,7 +541,9 @@ function applyChange(groupId, action) {
 - `model-value` in this demo uses Tiptap JSON documents instead of HTML strings.
 - Paragraph inline content now supports `text`, `hardBreak`, `inlineEquation` and other inline atoms.
 - `computeDiff()` returns both `chunks` and `reviewDoc`.
+- `diffTool.compareDiff()` returns the same result shape as `computeDiff()`.
 - `reviewDoc` can be rendered directly by `power-editor` as the final compare result.
+- `applyTrackedGroup()` can be imported from `@creatorsn/powereditor3` after package installation.
 
 <style scoped>
 .snapshot-compare-demo {

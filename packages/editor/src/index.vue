@@ -275,6 +275,14 @@ const props = defineProps({
 	dragHandlerNested: {
 		default: false,
 	},
+	diffInlineBlockTypes: {
+		default: () => [],
+		type: Array,
+	},
+	diffContainerBlockTypes: {
+		default: () => [],
+		type: Array,
+	},
 	language: {
 		default: "cn",
 	},
@@ -288,6 +296,7 @@ defineExpose({
 	saveMarkdown: (...args) => proxy.saveMarkdown(...args),
 	computeMarkdown: (...args) => proxy.computeMarkdown(...args),
 	insertMarkdown: (...args) => proxy.insertMarkdown(...args),
+	compareDiff: (...args) => proxy.compareDiff(...args),
 	editor: () => proxy.$data.editor, // this is a function
 	focus: () => proxy.focus(),
 });
@@ -317,6 +326,7 @@ import {
 } from "@tiptap/extension-details";
 import { lowlight } from "./js/lowlight";
 import { Encoder, Decoder } from "./js/markdown";
+import { diffTool } from "./js/diffTool/index.js";
 
 import ImageBlock from "./components/custom/extension/imageBlock.js";
 import EmbedBlock from "./components/custom/extension/embedBlock.js";
@@ -553,6 +563,13 @@ export default {
 
 			return defaultStorage;
 		},
+		syncDiffToolConfig() {
+			diffTool.configure({
+				reset: true,
+				extendInlineDiffBlockTypes: this.diffInlineBlockTypes,
+				extendContainerDiffBlockTypes: this.diffContainerBlockTypes,
+			});
+		},
 		propsSync() {
 			this.editor.storage.defaultStorage.codeBlockLanguagesBox =
 				this.codeBlockLanguagesBox;
@@ -741,6 +758,10 @@ export default {
 			let deserialized = this.computeMarkdown(content);
 			this.editor.commands.setContent(deserialized);
 			return deserialized;
+		},
+		compareDiff(sourceDoc, targetDoc) {
+			this.syncDiffToolConfig();
+			return diffTool.compareDiff(sourceDoc, targetDoc);
 		},
 		saveMarkdown() {
 			let dec = new Decoder(this.mdDecNodeFuncsPlugins, this.mdFlags);

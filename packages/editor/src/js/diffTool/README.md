@@ -921,9 +921,17 @@ export {
 	buildInlineTokens,
 	buildReviewDoc,
 	buildReviewNodes,
+	containerDiffBlockTypes,
 	computeDiff,
+	configureDiffTool,
+	diffTool,
 	diffBlocks,
 	diffInlineTokens,
+	inlineDiffBlockTypes,
+	registerContainerDiffBlockType,
+	registerInlineDiffBlockType,
+	unregisterContainerDiffBlockType,
+	unregisterInlineDiffBlockType,
 };
 ```
 
@@ -939,6 +947,56 @@ computeDiff(sourceDoc, targetDoc)
 - 可直接渲染的 `reviewDoc`
 
 其他导出更适合做调试、测试或局部复用。
+
+### 23.1 现在如何扩展可细分的 block 类型
+
+如果你希望用更统一的调用方式，现在可以直接使用：
+
+```js
+diffTool
+	.configure({
+		extendInlineDiffBlockTypes: ["customParagraphLike"],
+		extendContainerDiffBlockTypes: ["customContainerLike"],
+	})
+	.compareDiff(sourceDoc, targetDoc);
+```
+
+这里的 `configure()` 会修改 diffTool 当前使用的 block 类型注册表，`compareDiff()` 则执行真正的 diff。
+
+`canInlineDiffBlock()` 和 `canContainerDiffBlock()` 现在不再写死依赖局部数组字面量，而是读取模块级注册表：
+
+```js
+const inlineDiffBlockTypes = ["paragraph", "heading", "blockquote"];
+const containerDiffBlockTypes = [
+	"bulletList",
+	"orderedList",
+	"listItem",
+	"taskList",
+	"taskItem",
+];
+```
+
+如果要完全替换默认配置，可以这样写：
+
+```js
+diffTool.configure({
+	inlineDiffBlockTypes: ["paragraph", "customParagraphLike"],
+	containerDiffBlockTypes: ["bulletList", "customContainerLike"],
+});
+```
+
+如果后续某个外部组件节点想接入当前 diff 体系，通常不需要改 `computeDiff()` 主流程，只要：
+
+- 新节点适合按段落类处理，就注册到 `inlineDiffBlockTypes`
+- 新节点适合按容器类递归处理，就注册到 `containerDiffBlockTypes`
+
+如果想回到默认配置，可以这样：
+
+```js
+diffTool.configure({ reset: true });
+```
+
+如果要更细地增删类型，也仍然可以调用对应的 `register...` / `unregister...` 方法。
 
 ## 24. 这份实现当前最重要的几个取舍
 

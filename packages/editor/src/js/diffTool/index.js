@@ -1,7 +1,87 @@
 import { diffArrays, diffWordsWithSpace } from "diff";
 
+const defaultInlineDiffBlockTypes = ["paragraph", "heading", "blockquote"];
+const defaultContainerDiffBlockTypes = [
+	"bulletList",
+	"orderedList",
+	"listItem",
+	"taskList",
+	"taskItem",
+];
+const inlineDiffBlockTypes = [...defaultInlineDiffBlockTypes];
+const containerDiffBlockTypes = [...defaultContainerDiffBlockTypes];
+
 function guid() {
 	return crypto.randomUUID();
+}
+
+function replaceBlockTypes(list, nextTypes = []) {
+	list.splice(0, list.length, ...Array.from(new Set(nextTypes.filter(Boolean))));
+	return list;
+}
+
+function registerBlockType(list, type) {
+	if (!type || list.includes(type)) {
+		return false;
+	}
+
+	list.push(type);
+	return true;
+}
+
+function unregisterBlockType(list, type) {
+	const index = list.indexOf(type);
+
+	if (index === -1) {
+		return false;
+	}
+
+	list.splice(index, 1);
+	return true;
+}
+
+function registerInlineDiffBlockType(type) {
+	return registerBlockType(inlineDiffBlockTypes, type);
+}
+
+function unregisterInlineDiffBlockType(type) {
+	return unregisterBlockType(inlineDiffBlockTypes, type);
+}
+
+function registerContainerDiffBlockType(type) {
+	return registerBlockType(containerDiffBlockTypes, type);
+}
+
+function unregisterContainerDiffBlockType(type) {
+	return unregisterBlockType(containerDiffBlockTypes, type);
+}
+
+function configureDiffTool(options = {}) {
+	const {
+		inlineDiffBlockTypes: nextInlineDiffBlockTypes,
+		containerDiffBlockTypes: nextContainerDiffBlockTypes,
+		extendInlineDiffBlockTypes = [],
+		extendContainerDiffBlockTypes = [],
+		reset = false,
+	} = options;
+
+	if (reset) {
+		replaceBlockTypes(inlineDiffBlockTypes, defaultInlineDiffBlockTypes);
+		replaceBlockTypes(containerDiffBlockTypes, defaultContainerDiffBlockTypes);
+	}
+
+	if (Array.isArray(nextInlineDiffBlockTypes)) {
+		replaceBlockTypes(inlineDiffBlockTypes, nextInlineDiffBlockTypes);
+	}
+
+	if (Array.isArray(nextContainerDiffBlockTypes)) {
+		replaceBlockTypes(containerDiffBlockTypes, nextContainerDiffBlockTypes);
+	}
+
+	extendInlineDiffBlockTypes.forEach(registerInlineDiffBlockType);
+	extendContainerDiffBlockTypes.forEach(registerContainerDiffBlockType);
+
+	return diffTool;
 }
 
 function clone(value) {
@@ -381,7 +461,7 @@ function canInlineDiffBlock(sourceBlock, targetBlock) {
 		sourceBlock &&
 		targetBlock &&
 		sourceBlock.type === targetBlock.type &&
-		["paragraph", "heading", "blockquote"].includes(sourceBlock.type)
+		inlineDiffBlockTypes.includes(sourceBlock.type)
 	);
 }
 
@@ -390,9 +470,7 @@ function canContainerDiffBlock(sourceBlock, targetBlock) {
 		sourceBlock &&
 		targetBlock &&
 		sourceBlock.type === targetBlock.type &&
-		["bulletList", "orderedList", "listItem", "taskList", "taskItem"].includes(
-			sourceBlock.type,
-		)
+		containerDiffBlockTypes.includes(sourceBlock.type)
 	);
 }
 
@@ -712,11 +790,30 @@ function computeDiff(sourceDoc = {}, targetDoc = {}) {
 	};
 }
 
+const diffTool = {
+	configure: (options = {}) => configureDiffTool(options),
+	compareDiff: (sourceDoc = {}, targetDoc = {}) => computeDiff(sourceDoc, targetDoc),
+	registerInlineDiffBlockType,
+	unregisterInlineDiffBlockType,
+	registerContainerDiffBlockType,
+	unregisterContainerDiffBlockType,
+	inlineDiffBlockTypes,
+	containerDiffBlockTypes,
+};
+
 export {
 	buildInlineTokens,
 	buildReviewDoc,
 	buildReviewNodes,
+	containerDiffBlockTypes,
 	computeDiff,
+	configureDiffTool,
+	diffTool,
 	diffBlocks,
 	diffInlineTokens,
+	inlineDiffBlockTypes,
+	registerContainerDiffBlockType,
+	registerInlineDiffBlockType,
+	unregisterContainerDiffBlockType,
+	unregisterInlineDiffBlockType,
 };
