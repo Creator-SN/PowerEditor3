@@ -94,6 +94,16 @@
 				'--selection-color': selectionForeground,
 				'--table-drag-color': tableDragColor,
 				'--code-color': codeColor,
+				'--tracked-change-insert-color': diffInsertColor,
+				'--tracked-change-insert-color-sec': diffInsertColorSec,
+				'--tracked-change-delete-color': diffDeleteColor,
+				'--tracked-change-delete-color-sec': diffDeleteColorSec,
+				'--tracked-change-insert-hover-color': diffInsertHoverColor,
+				'--tracked-change-delete-hover-color': diffDeleteHoverColor,
+				'--tracked-change-insert-hover-color-sec':
+					diffInsertHoverColorSec,
+				'--tracked-change-delete-hover-color-sec':
+					diffDeleteHoverColorSec,
 			}"
 		>
 			<slot name="front-content"></slot>
@@ -275,6 +285,38 @@ const props = defineProps({
 	dragHandlerNested: {
 		default: false,
 	},
+	diffInlineBlockTypes: {
+		default: () => [],
+		type: Array,
+	},
+	diffContainerBlockTypes: {
+		default: () => [],
+		type: Array,
+	},
+	diffInsertColor: {
+		default: "",
+	},
+	diffDeleteColor: {
+		default: "",
+	},
+	diffInsertColorSec: {
+		default: "",
+	},
+	diffDeleteColorSec: {
+		default: "",
+	},
+	diffInsertHoverColor: {
+		default: "",
+	},
+	diffDeleteHoverColor: {
+		default: "",
+	},
+	diffInsertHoverColorSec: {
+		default: "",
+	},
+	diffDeleteHoverColorSec: {
+		default: "",
+	},
 	language: {
 		default: "cn",
 	},
@@ -288,6 +330,7 @@ defineExpose({
 	saveMarkdown: (...args) => proxy.saveMarkdown(...args),
 	computeMarkdown: (...args) => proxy.computeMarkdown(...args),
 	insertMarkdown: (...args) => proxy.insertMarkdown(...args),
+	compareDiff: (...args) => proxy.compareDiff(...args),
 	editor: () => proxy.$data.editor, // this is a function
 	focus: () => proxy.focus(),
 });
@@ -317,6 +360,7 @@ import {
 } from "@tiptap/extension-details";
 import { lowlight } from "./js/lowlight";
 import { Encoder, Decoder } from "./js/markdown";
+import { diffTool } from "./js/diffTool/index.js";
 
 import ImageBlock from "./components/custom/extension/imageBlock.js";
 import EmbedBlock from "./components/custom/extension/embedBlock.js";
@@ -327,6 +371,10 @@ import EquationBlock from "./components/custom/extension/equationBlock.js";
 import MentionItem from "./components/custom/extension/mentionItem.js";
 import DrawingBlock from "./components/custom/extension/drawingBlock.js";
 import FormatPainter from "./components/custom/extension/formatPainter.js";
+import {
+	TrackedChange,
+	TrackedChangeNodeAttributes,
+} from "./components/custom/extension/trackedChange.js";
 
 import toolBar from "./components/toolBar.vue";
 import bubbleToolBar from "./components/bubbleToolBar.vue";
@@ -429,6 +477,8 @@ export default {
 				EquationBlock,
 				MentionItem,
 				DrawingBlock,
+				TrackedChangeNodeAttributes,
+				TrackedChange,
 				Table.configure({
 					HTMLAttributes: {},
 					resizable: true,
@@ -546,6 +596,13 @@ export default {
 			});
 
 			return defaultStorage;
+		},
+		syncDiffToolConfig() {
+			diffTool.configure({
+				reset: true,
+				extendInlineDiffBlockTypes: this.diffInlineBlockTypes,
+				extendContainerDiffBlockTypes: this.diffContainerBlockTypes,
+			});
 		},
 		propsSync() {
 			this.editor.storage.defaultStorage.codeBlockLanguagesBox =
@@ -735,6 +792,10 @@ export default {
 			let deserialized = this.computeMarkdown(content);
 			this.editor.commands.setContent(deserialized);
 			return deserialized;
+		},
+		compareDiff(sourceDoc, targetDoc) {
+			this.syncDiffToolConfig();
+			return diffTool.compareDiff(sourceDoc, targetDoc);
 		},
 		saveMarkdown() {
 			let dec = new Decoder(this.mdDecNodeFuncsPlugins, this.mdFlags);

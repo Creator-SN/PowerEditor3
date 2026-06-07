@@ -73,6 +73,7 @@ const exportMarkdown = async () => {
 - [Image Insertion Optimization](./image-paste-drop)
 - [MentionItem](./mention-item)
 - [Markdown Decoder Plugins](./markdown-decoder-plugins)
+- [Snapshot Compare](./snapshot-compare)
 
 ## Props
 
@@ -115,6 +116,16 @@ const exportMarkdown = async () => {
 | `showDragHandler` | `boolean` | No | `false` | Whether to show the block drag handle. |
 | `ignoreDragNodeType` | `array` | No | `[]` | List of node types where the drag handle should be hidden. |
 | `dragHandlerNested` | `boolean` | No | `false` | Whether the drag handle should work inside nested block nodes. |
+| `diffInlineBlockTypes` | `string[]` | No | `[]` | Additional block node types that should still be diffed like inline content. Use this for custom nodes that look block-level but should compare inner inline fragments. |
+| `diffContainerBlockTypes` | `string[]` | No | `[]` | Additional block node types that should be diffed as container nodes. Useful for wrappers, layout containers, and custom nested structures. |
+| `diffInsertColor` | `string` | No | `""` | Primary highlight color for inserted changes. |
+| `diffDeleteColor` | `string` | No | `""` | Primary highlight color for deleted changes. |
+| `diffInsertColorSec` | `string` | No | `""` | Secondary accent color for inserted changes, usually used for borders or supporting decoration. |
+| `diffDeleteColorSec` | `string` | No | `""` | Secondary accent color for deleted changes. |
+| `diffInsertHoverColor` | `string` | No | `""` | Hover highlight color for inserted changes. |
+| `diffDeleteHoverColor` | `string` | No | `""` | Hover highlight color for deleted changes. |
+| `diffInsertHoverColorSec` | `string` | No | `""` | Secondary hover accent color for inserted changes. |
+| `diffDeleteHoverColorSec` | `string` | No | `""` | Secondary hover accent color for deleted changes. |
 
 ## Events
 
@@ -241,6 +252,9 @@ const exportMarkdown = async () => {
 | `editor.saveMarkdown()` | Converts the current editor content to Markdown. |
 | `editor.computeMarkdown(markdown)` | Parses Markdown into editor content. |
 | `editor.insertMarkdown(markdown)` | Inserts Markdown at the current position. |
+| `editor.compareDiff(sourceDoc, targetDoc)` | Runs the built-in diff entry and returns the same result shape as `computeDiff()`. |
+| `editor.editor()` | Returns the current Tiptap editor instance so you can call low-level APIs such as `getJSON()` or editor commands directly. |
+| `editor.focus()` | Moves focus into the editor. |
 
 ## Slots
 

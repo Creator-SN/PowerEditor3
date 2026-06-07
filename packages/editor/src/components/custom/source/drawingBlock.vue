@@ -1,5 +1,5 @@
 <template>
-    <node-view-wrapper class="power-editor-drawing-block-container" :class="[{ dark: thisTheme === 'dark' }]" :style="{ 'justify-content': node.attrs.alignCenter ? 'center' : 'flex-start' }">
+    <node-view-wrapper class="power-editor-drawing-block-container" :class="[{ dark: thisTheme === 'dark' }, { 'tracked-change': !!node.attrs.trackedChange }, node.attrs.trackedChange ? `tracked-change-${node.attrs.trackedChange.type}` : '']" :style="{ 'justify-content': node.attrs.alignCenter ? 'center' : 'flex-start' }">
         <div v-show="editor.isEditable" class="power-editor-d-b-container">
             <div class="power-editor-d-b-block l1">
                 <fv-button

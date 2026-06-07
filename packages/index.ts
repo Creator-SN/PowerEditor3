@@ -1,6 +1,24 @@
 import { App, Plugin } from 'vue';
 import PowerEditor from './editor';
 import DevC from './devC'
+export { PowerEditor } from './editor';
+export {
+    computeDiff,
+    diffTool,
+    configureDiffTool,
+    diffBlocks,
+    diffInlineTokens,
+    buildReviewDoc,
+    buildReviewNodes,
+    buildInlineTokens,
+    inlineDiffBlockTypes,
+    containerDiffBlockTypes,
+    registerInlineDiffBlockType,
+    unregisterInlineDiffBlockType,
+    registerContainerDiffBlockType,
+    unregisterContainerDiffBlockType,
+} from './editor/src/js/diffTool/index.js';
+export { applyTrackedGroup } from './editor/src/js/diffTool/apply.js';
 
 const components = [
     PowerEditor,

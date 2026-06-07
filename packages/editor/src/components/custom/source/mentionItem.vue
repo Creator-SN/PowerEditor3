@@ -3,11 +3,17 @@
 		v-if="node"
 		as="span"
 		class="power-editor-mention-container"
-		:class="{
-			dark: thisTheme === 'dark',
-			selected: selected,
-			showing: showPopper && thisMentionList.length > 0,
-		}"
+		:class="[
+			{
+				dark: thisTheme === 'dark',
+				selected: selected,
+				showing: showPopper && thisMentionList.length > 0,
+				'tracked-change': !!node.attrs.trackedChange,
+			},
+			node.attrs.trackedChange
+				? `tracked-change-${node.attrs.trackedChange.type}`
+				: '',
+		]"
 		:style="{
 			'--selected-bg': focusForeground,
 			'--selected-bg-hover': hoverForeground,
