@@ -37,17 +37,6 @@ declare module 'vue' {
     export interface GlobalComponents {
         DevC: typeof DevC;
         PowerEditor: typeof PowerEditor;
-        'dev-c': typeof DevC;
-        'power-editor': typeof PowerEditor;
-    }
-}
-
-declare module '@vue/runtime-core' {
-    export interface GlobalComponents {
-        DevC: typeof DevC;
-        PowerEditor: typeof PowerEditor;
-        'dev-c': typeof DevC;
-        'power-editor': typeof PowerEditor;
     }
 }
 
