@@ -545,19 +545,32 @@ export default {
 				return false;
 			}
 
-			event.preventDefault();
+			if (!this.editable) {
+				event.preventDefault();
+				return true;
+			}
 
-			if (
+			let listItemType = null;
+			if (this.editor.isActive("powerTaskItem")) {
+				listItemType = "powerTaskItem";
+			} else if (
 				this.editor.isActive("bulletList") ||
 				this.editor.isActive("orderedList")
 			) {
+				listItemType = "listItem";
+			}
+
+			if (listItemType) {
+				event.preventDefault();
+				if (event.shiftKey) {
+					this.editor.commands.liftListItem(listItemType);
+				} else {
+					this.editor.commands.sinkListItem(listItemType);
+				}
 				return true;
 			}
 
-			if (!this.editable) {
-				return true;
-			}
-
+			event.preventDefault();
 			this.editor.commands.insertContent("\t");
 			return true;
 		},
