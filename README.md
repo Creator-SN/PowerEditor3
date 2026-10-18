@@ -49,7 +49,7 @@ Install the package with Yarn:
 yarn add @creatorsn/powereditor3
 ```
 
-npm and pnpm work in a similar way.
+PowerEditor3 installs Tiptap, ProseMirror, and Yjs itself; applications do not need to declare them separately. The application provides Vue. npm and pnpm work in a similar way.
 
 ## Quick Start
 
@@ -80,6 +80,17 @@ import { ref } from 'vue';
 const content = ref('<p>Hello PowerEditor3</p>');
 </script>
 ```
+
+## Collaboration and shared runtime
+
+The drag handle still works with `showDragHandler` alone. Import collaboration APIs from PowerEditor3 so they share the editor runtime.
+
+```js
+import { Node, mergeAttributes, VueNodeViewRenderer } from '@creatorsn/powereditor3';
+import { Collaboration, Y, Awareness, yCursorPlugin } from '@creatorsn/powereditor3/collaboration';
+```
+
+The collaboration entry exports `Collaboration`, `Y`, Awareness, and Y-Tiptap conversion helpers. The main entry exports common Tiptap/Vue APIs. The application creates a Y.Doc, connects a provider, and passes the extension through the editor's `extensions` prop.
 
 ## Documentation
 

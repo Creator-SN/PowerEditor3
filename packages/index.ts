@@ -2,6 +2,8 @@ import { App, Plugin } from 'vue';
 import PowerEditor from './editor';
 import DevC from './devC'
 export { PowerEditor } from './editor';
+export { Extension, Node, mergeAttributes } from '@tiptap/core';
+export { NodeViewWrapper, NodeViewContent, nodeViewProps, VueNodeViewRenderer } from '@tiptap/vue-3';
 export {
     computeDiff,
     diffTool,

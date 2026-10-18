@@ -17,17 +17,16 @@ export default defineConfig({
     plugins: [vue()],
     build: {
         lib: {
-            entry: resolve(__dirname, './packages/index.ts'),
-            name: '@creatorsn/powereditor3',
-            fileName: 'powereditor3',
+            entry: {
+                powereditor3: resolve(__dirname, './packages/index.ts'),
+                collaboration: resolve(__dirname, './packages/collaboration/index.ts'),
+            },
+            fileName: (_, name) => `${name}.js`,
+            cssFileName: 'powereditor3',
+            formats: ['es'],
         },
         rollupOptions: {
-            external: ['vue'],
-            output: {
-                globals: {
-                    vue: 'Vue',
-                },
-            },
+            external: ['vue', /^@tiptap\/(?:core|pm|vue-3|extension-collaboration|extension-drag-handle-vue-3|y-tiptap)(?:\/|$)/, /^prosemirror-/, /^yjs$/, /^y-protocols(?:\/|$)/],
         },
     },
     resolve: {

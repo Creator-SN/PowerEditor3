@@ -1,7 +1,7 @@
 {
     "name": "@creatorsn/powereditor3",
     "private": false,
-    "version": "0.4.7",
+    "version": "0.5.0",
     "publishConfig": {
         "access": "public"
     },
@@ -11,15 +11,16 @@
     "types": "./dist/types/index.d.ts",
     "exports": {
         ".": {
-            "import": "./dist/powereditor3.js",
-            "require": "./dist/powereditor3.umd.cjs",
-            "types": "./dist/types/index.d.ts"
+            "types": "./dist/types/index.d.ts",
+            "import": "./dist/powereditor3.js"
         },
-        "./powereditor3.css": "./dist/powereditor3.css"
+        "./powereditor3.css": "./dist/powereditor3.css",
+        "./collaboration": {
+            "types": "./dist/types/collaboration/index.d.ts",
+            "import": "./dist/collaboration.js"
+        }
     },
     "type": "module",
-    "main": "dist/powereditor3.umd.cjs",
-    "module": "dist/powereditor3.js",
     "scripts": {
         "docs:dev": "vitepress dev docs",
         "docs:build": "vitepress build docs",
@@ -29,34 +30,37 @@
     },
     "dependencies": {
         "@creatorsn/vfluent3": "^0.3.90",
-        "@tiptap/core": "3.23.6",
-        "@tiptap/extension-bubble-menu": "3.23.6",
-        "@tiptap/extension-code-block": "3.23.6",
-        "@tiptap/extension-code-block-lowlight": "3.23.6",
-        "@tiptap/extension-collaboration": "^3.26.0",
-        "@tiptap/extension-color": "3.23.6",
-        "@tiptap/extension-details": "^3.25.0",
-        "@tiptap/extension-drag-handle": "^3.26.0",
-        "@tiptap/extension-drag-handle-vue-3": "^3.26.0",
-        "@tiptap/extension-highlight": "3.23.6",
-        "@tiptap/extension-link": "3.23.6",
-        "@tiptap/extension-node-range": "^3.26.0",
-        "@tiptap/extension-placeholder": "3.23.6",
-        "@tiptap/extension-subscript": "3.23.6",
-        "@tiptap/extension-superscript": "3.23.6",
-        "@tiptap/extension-table": "3.23.6",
-        "@tiptap/extension-table-cell": "3.23.6",
-        "@tiptap/extension-table-header": "3.23.6",
-        "@tiptap/extension-table-row": "3.23.6",
-        "@tiptap/extension-task-item": "3.23.6",
-        "@tiptap/extension-task-list": "3.23.6",
-        "@tiptap/extension-text-align": "3.23.6",
-        "@tiptap/extension-text-style": "3.23.6",
-        "@tiptap/extension-underline": "3.23.6",
-        "@tiptap/pm": "3.23.6",
-        "@tiptap/starter-kit": "3.23.6",
-        "@tiptap/vue-3": "3.23.6",
-        "@tiptap/y-tiptap": "^3.0.4",
+        "@floating-ui/dom": "^1.0.0",
+        "@tiptap/core": "3.26.0",
+        "@tiptap/extension-bubble-menu": "3.26.0",
+        "@tiptap/extension-code-block": "3.26.0",
+        "@tiptap/extension-code-block-lowlight": "3.26.0",
+        "@tiptap/extension-collaboration": "3.26.0",
+        "@tiptap/extension-color": "3.26.0",
+        "@tiptap/extension-details": "3.26.0",
+        "@tiptap/extension-drag-handle": "3.26.0",
+        "@tiptap/extension-drag-handle-vue-3": "3.26.0",
+        "@tiptap/extension-highlight": "3.26.0",
+        "@tiptap/extension-link": "3.26.0",
+        "@tiptap/extension-list": "3.26.0",
+        "@tiptap/extension-node-range": "3.26.0",
+        "@tiptap/extension-placeholder": "3.26.0",
+        "@tiptap/extension-subscript": "3.26.0",
+        "@tiptap/extension-superscript": "3.26.0",
+        "@tiptap/extension-table": "3.26.0",
+        "@tiptap/extension-table-cell": "3.26.0",
+        "@tiptap/extension-table-header": "3.26.0",
+        "@tiptap/extension-table-row": "3.26.0",
+        "@tiptap/extension-task-item": "3.26.0",
+        "@tiptap/extension-task-list": "3.26.0",
+        "@tiptap/extension-text-align": "3.26.0",
+        "@tiptap/extension-text-style": "3.26.0",
+        "@tiptap/extension-underline": "3.26.0",
+        "@tiptap/extensions": "3.26.0",
+        "@tiptap/pm": "3.26.0",
+        "@tiptap/starter-kit": "3.26.0",
+        "@tiptap/vue-3": "3.26.0",
+        "@tiptap/y-tiptap": "3.0.4",
         "autoprefixer": "^10.4.21",
         "core-js": "3.30.1",
         "d3": "7.0.4",
@@ -75,9 +79,8 @@
         "simplify-js": "^1.2.4",
         "unplugin-vue-define-options": "^3.0.0-beta.14",
         "url": "^0.11.4",
-        "vue": "^3.5.13",
-        "y-protocols": "^1.0.7",
-        "yjs": "^13.6.31"
+        "y-protocols": "1.0.7",
+        "yjs": "13.6.31"
     },
     "devDependencies": {
         "@types/node": "^24.0.3",
@@ -86,6 +89,7 @@
         "typescript": "~5.8.3",
         "vite": "^6.3.5",
         "vitepress": "^1.6.3",
+        "vue": "^3.5.13",
         "vue-tsc": "^2.2.8"
     },
     "overrides": {
@@ -99,5 +103,8 @@
         "prosemirror-state": "1.4.4",
         "prosemirror-transform": "1.12.0",
         "prosemirror-view": "1.41.8"
+    },
+    "peerDependencies": {
+        "vue": "^3.4.0"
     }
 }

@@ -49,7 +49,7 @@ PowerEditor3 是一个基于 [Tiptap](https://tiptap.dev/) 与 [VFluent3](https:
 yarn add @creatorsn/powereditor3
 ```
 
-npm 和 pnpm 也可以按类似方式安装。
+Tiptap、ProseMirror 与 Yjs 由 PowerEditor3 自身安装；应用无需再单独声明它们。Vue 由应用提供。npm 和 pnpm 也可以按类似方式安装。
 
 ## 快速开始
 
@@ -80,6 +80,17 @@ import { ref } from 'vue';
 const content = ref('<p>Hello PowerEditor3</p>');
 </script>
 ```
+
+## 协同接口与共享运行时
+
+拖拽手柄仍可直接通过 `showDragHandler` 使用。协同所需对象从 PowerEditor3 导入，与编辑器共用依赖。
+
+```js
+import { Node, mergeAttributes, VueNodeViewRenderer } from '@creatorsn/powereditor3';
+import { Collaboration, Y, Awareness, yCursorPlugin } from '@creatorsn/powereditor3/collaboration';
+```
+
+协同入口导出 `Collaboration`、`Y`、Awareness 和 Y-Tiptap 转换函数；主入口导出常用 Tiptap/Vue 对象。由应用创建 Y.Doc、连接同步服务并通过编辑器的 `extensions` 属性传入。
 
 ## 文档
 
