@@ -11,6 +11,26 @@ const editor = ref(null);
 const mdFileInput = ref(null);
 const editable = ref(true);
 const editorContent = ref("<h2>PowerEditor Markdown Demo</h2><p>Use the buttons on the right to import or export Markdown.</p>");
+const mediaContainerButtons = {
+    left: [],
+    right: [
+        {
+            icon: "Add",
+            title: "Add drawing block",
+            func: ({ editor, node, pos }) => {
+                editor.commands.insertContentAt(
+                    pos + node.nodeSize,
+                    "<drawing-block></drawing-block>",
+                );
+            },
+        },
+    ],
+};
+
+const initializeDrawingDemo = (editor) => {
+    editor.commands.setContent("<drawing-block></drawing-block>");
+};
+
 
 const openMarkdownFile = () => {
     mdFileInput.value?.click();
@@ -99,6 +119,7 @@ const exportMarkdown = async () => {
 | `mentionItemAttr` | `object` | No | - | MentionItem configuration. See [MentionItem](./mention-item). |
 | `starterKit` | `object` | No | `() => ({})` | Custom configuration for Tiptap `StarterKit`. |
 | `showControlOnReadonly` | `boolean` | No | `true` | Whether to show controls in read-only mode. |
+| `mediaContainerButtons` | `object` | No | `{ left: [], right: [] }` | Custom media container control buttons. See below. |
 | `mdDecNodeFuncsPlugins` | `object` | No | - | Custom Markdown decoder functions. See [Markdown Decoder Plugins](./markdown-decoder-plugins). |
 | `mdFlags` | `object` | No | - | Custom Markdown decoder traversal flags. |
 | `foreground` | `string` | No | `#958DF1` | Editor accent color. |
@@ -126,6 +147,21 @@ const exportMarkdown = async () => {
 | `diffDeleteHoverColor` | `string` | No | `""` | Hover highlight color for deleted changes. |
 | `diffInsertHoverColorSec` | `string` | No | `""` | Secondary hover accent color for inserted changes. |
 | `diffDeleteHoverColorSec` | `string` | No | `""` | Secondary hover accent color for deleted changes. |
+
+## Custom Media Container Buttons
+
+Media containers such as images, equations, embeds and drawings can show custom buttons on the left or right side of the control bar. Configure them with the `mediaContainerButtons` prop:
+
+<power-editor
+    :theme="viteData.isDark.value ? 'dark' : 'light'"
+    :media-container-buttons="mediaContainerButtons"
+    @on-mounted="initializeDrawingDemo"
+    style="width: 100%;"
+></power-editor>
+
+Click `Add` in the initial drawing block to append another drawing block.
+
+Each button supports `icon` (Fluent UI icon name without the `ms-Icon--` prefix), `background` (background color), `title` (tooltip) and `func` (click callback). The callback receives `{ editor, node, pos }`: the current Tiptap editor, the media node and its document position. If omitted, `background` uses the same theme-based color as built-in buttons; both lists default to empty. Custom buttons follow the media control bar visibility rules, including `showControlOnReadonly`.
 
 ## Events
 

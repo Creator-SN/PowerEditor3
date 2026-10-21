@@ -11,6 +11,27 @@ const editor = ref(null);
 const mdFileInput = ref(null);
 const editable = ref(true);
 const editorContent = ref("<h2>PowerEditor Markdown Demo</h2><p>点击右上角按钮导入或导出 Markdown。</p>");
+const mediaContainerButtons = {
+    left: [],
+    right: [
+        {
+            icon: "Add",
+            title: "添加绘图块",
+            background: "rgba(133, 155, 220, 0.3)",
+            func: ({ editor, node, pos }) => {
+                editor.commands.insertContentAt(
+                    pos + node.nodeSize,
+                    "<drawing-block></drawing-block>",
+                );
+            },
+        },
+    ],
+};
+
+const initializeDrawingDemo = (editor) => {
+    editor.commands.setContent("<drawing-block></drawing-block>");
+};
+
 
 const openMarkdownFile = () => {
     mdFileInput.value?.click();
@@ -99,6 +120,7 @@ const exportMarkdown = async () => {
 | `mentionItemAttr` | `object` | 否 | - | MentionItem 配置项。详见 [MentionItem](./mention-item)。 |
 | `starterKit` | `object` | 否 | `() => ({})` | Tiptap `StarterKit` 相关自定义配置。 |
 | `showControlOnReadonly` | `boolean` | 否 | `true` | 只读模式下是否显示控制栏。 |
+| `mediaContainerButtons` | `object` | 否 | `{ left: [], right: [] }` | 媒体容器控制栏自定义按钮配置，详见下文。 |
 | `mdDecNodeFuncsPlugins` | `object` | 否 | - | Markdown 解码器自定义节点或标记渲染函数。详见 [Markdown Decoder Plugins](./markdown-decoder-plugins)。 |
 | `mdFlags` | `object` | 否 | - | Markdown 解码器递归层级标记配置。 |
 | `foreground` | `string` | 否 | `#958DF1` | 编辑器强调色。 |
@@ -126,6 +148,21 @@ const exportMarkdown = async () => {
 | `diffDeleteHoverColor` | `string` | 否 | `""` | 鼠标移入删除变更时的高亮色。 |
 | `diffInsertHoverColorSec` | `string` | 否 | `""` | 插入变更 hover 状态的辅助色。 |
 | `diffDeleteHoverColorSec` | `string` | 否 | `""` | 删除变更 hover 状态的辅助色。 |
+
+## 媒体容器自定义按钮
+
+图片、公式、嵌入内容和绘图等媒体容器支持在控制栏左侧或右侧添加自定义按钮。通过 `mediaContainerButtons` prop 配置：
+
+<power-editor
+    :theme="viteData.isDark.value ? 'dark' : 'light'"
+    :media-container-buttons="mediaContainerButtons"
+    @on-mounted="initializeDrawingDemo"
+    style="width: 100%;"
+></power-editor>
+
+初始绘图块右上角的 `Add` 按钮会在当前绘图块后追加一个新绘图块。
+
+每个按钮项支持 `icon`（Fluent UI 图标名，不含 `ms-Icon--` 前缀）、`background`（背景色）、`title`（悬浮提示）和 `func`（点击回调）。点击回调接收 `{ editor, node, pos }`：`editor` 是当前 Tiptap 编辑器，`node` 是媒体节点，`pos` 是节点在文档中的位置。省略 `background` 时使用与内置按钮一致的主题背景；左右列表默认为空。按钮跟随媒体控制栏的显示规则，在只读模式下是否显示由 `showControlOnReadonly` 控制。
 
 ## Events
 

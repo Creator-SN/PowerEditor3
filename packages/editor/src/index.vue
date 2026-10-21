@@ -247,6 +247,9 @@ const props = defineProps({
 	imgInterceptor: {
 		default: null,
 	},
+	mediaContainerButtons: {
+		default: () => ({ left: [], right: [] }),
+	},
 	mentionItemAttr: {
 		default: () => ({}),
 	},
@@ -411,6 +414,12 @@ export default {
 		},
 		language() {
 			this.propsSync();
+		},
+		mediaContainerButtons: {
+			handler() {
+				this.propsSync();
+			},
+			deep: true,
 		},
 		theme() {
 			this.propsSync();
@@ -602,6 +611,7 @@ export default {
 				addStorage() {
 					return {
 						showControlOnReadonly: false,
+						mediaContainerButtons: { left: [], right: [] },
 						language: "en",
 						theme: "light",
 					};
@@ -624,6 +634,8 @@ export default {
 				this.codeBlockLineNumbers;
 			this.editor.storage.defaultStorage.showControlOnReadonly =
 				this.showControlOnReadonly;
+			this.editor.storage.defaultStorage.mediaContainerButtons =
+				this.mediaContainerButtons || { left: [], right: [] };
 			this.editor.storage.defaultStorage.imgLazyLoad = this.imgLazyLoad;
 			this.editor.storage.defaultStorage.imgPreview = this.imgPreview;
 			this.editor.storage.defaultStorage.foreground = this.foreground;

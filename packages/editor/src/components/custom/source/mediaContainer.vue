@@ -2,7 +2,11 @@
 	<div
 		class="power-editor-media-container"
 		:class="[{ dark: theme === 'dark' }, { 'active-effects': active }]"
-		:style="{ width: moveable ? `${elWidthEnd}px` : normalizeWidthValue(currentWidth) }"
+		:style="{
+			width: moveable
+				? `${elWidthEnd}px`
+				: normalizeWidthValue(currentWidth),
+		}"
 	>
 		<div
 			v-show="
@@ -59,13 +63,27 @@
 		>
 			<fv-button
 				v-show="editor.isEditable"
+				v-for="(button, index) in mediaContainerButtons.left"
+				:key="`left-${index}`"
+				class="power-editor-media-cmd-btn"
+				:background="button.background || defaultButtonBackground"
+				:border-radius="6"
+				:theme="theme"
+				fontSize="10"
+				:title="button.title"
+				@click.stop="runMediaButton(button)"
+			>
+				<i :class="['ms-Icon', `ms-Icon--${button.icon}`]"></i>
+			</fv-button>
+			<fv-button
+				v-show="editor.isEditable"
 				class="power-editor-media-cmd-btn"
 				:background="
 					theme === 'dark'
 						? 'rgba(0, 0, 0, 0.8)'
 						: 'rgba(255, 255, 255, 0.0)'
 				"
-                :border-radius="6"
+				:border-radius="6"
 				:theme="theme"
 				fontSize="10"
 				:title="getTitle('Caption')"
@@ -80,7 +98,7 @@
 						? 'rgba(0, 0, 0, 0.8)'
 						: 'rgba(255, 255, 255, 0.0)'
 				"
-                :border-radius="6"
+				:border-radius="6"
 				:theme="theme"
 				fontSize="10"
 				:title="getTitle('AlignLeft')"
@@ -95,13 +113,27 @@
 						? 'rgba(0, 0, 0, 0.8)'
 						: 'rgba(255, 255, 255, 0.0)'
 				"
-                :border-radius="6"
+				:border-radius="6"
 				:theme="theme"
 				fontSize="10"
 				:title="getTitle('AlignCenter')"
 				@click="thisAlignCenter = true"
 			>
 				<i class="ms-Icon ms-Icon--AlignCenter"></i>
+			</fv-button>
+			<fv-button
+				v-show="editor.isEditable"
+				v-for="(button, index) in mediaContainerButtons.right"
+				:key="`right-${index}`"
+				class="power-editor-media-cmd-btn"
+				:background="button.background || defaultButtonBackground"
+				:border-radius="6"
+				:theme="theme"
+				fontSize="10"
+				:title="button.title"
+				@click.stop="runMediaButton(button)"
+			>
+				<i :class="['ms-Icon', `ms-Icon--${button.icon}`]"></i>
 			</fv-button>
 		</div>
 		<div
@@ -115,7 +147,7 @@
 						? 'rgba(0, 0, 0, 0.8)'
 						: 'rgba(255, 255, 255, 0.0)'
 				"
-                :border-radius="6"
+				:border-radius="6"
 				:theme="theme"
 				icon="ReturnKeySm"
 				fontSize="10"
@@ -248,7 +280,30 @@ export default {
 		this.Init();
 		this.outSideClickInit();
 	},
+	computed: {
+		mediaContainerButtons() {
+			return (
+				this.editor.storage.defaultStorage.mediaContainerButtons || {
+					left: [],
+					right: [],
+				}
+			);
+		},
+		defaultButtonBackground() {
+			return this.theme === "dark"
+				? "rgba(0, 0, 0, 0.8)"
+				: "rgba(255, 255, 255, 0.0)";
+		},
+	},
 	methods: {
+		runMediaButton(button) {
+			if (typeof button.func !== "function") return;
+			button.func({
+				editor: this.editor,
+				node: this.node,
+				pos: this.getPos(),
+			});
+		},
 		Init() {
 			let agent = (event) => {
 				return (
@@ -333,7 +388,7 @@ export default {
 			this.editor.commands.focus();
 			this.editor.commands.insertContentAt(
 				this.getPos() + this.node.nodeSize - 1,
-				"<br>"
+				"<br>",
 			);
 		},
 	},
@@ -388,7 +443,10 @@ export default {
 
 	.power-editor-media-slot-container {
 		position: relative;
-		transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+		transition:
+			transform 0.3s,
+			box-shadow 0.3s,
+			opacity 0.3s;
 	}
 
 	.power-editor-media-control-resize-block {

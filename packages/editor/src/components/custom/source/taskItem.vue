@@ -115,6 +115,7 @@ export default {
     .power-editor-task-item-content {
         min-width: 10px;
         margin-left: 5px;
+        flex: 1;
         white-space: nowrap;
 
         p
