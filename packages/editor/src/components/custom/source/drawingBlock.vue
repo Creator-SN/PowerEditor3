@@ -79,9 +79,11 @@
             </div>
         </div>
         <media-container
-            v-model:width="node.attrs.width"
+            :width="node.attrs.width"
+            @update:width="updateAttributes({ width: $event })"
             :caption="node.attrs.caption"
-            v-model:alignCenter="node.attrs.alignCenter"
+            :alignCenter="node.attrs.alignCenter"
+            @update:alignCenter="updateAttributes({ alignCenter: $event })"
             :editor="editor"
             :theme="thisTheme"
             :foreground="thisForeground"

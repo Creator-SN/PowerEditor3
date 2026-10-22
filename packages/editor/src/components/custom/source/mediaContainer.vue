@@ -255,13 +255,17 @@ export default {
 			this.currentWidth = this.normalizeWidthValue(val);
 		},
 		currentWidth(val) {
-			this.$emit("update:width", val);
+			if (val !== this.normalizeWidthValue(this.width)) {
+				this.$emit("update:width", val);
+			}
 		},
 		alignCenter(val) {
 			this.thisAlignCenter = val;
 		},
 		thisAlignCenter(val) {
-			this.$emit("update:alignCenter", val);
+			if (val !== this.alignCenter) {
+				this.$emit("update:alignCenter", val);
+			}
 		},
 		caption(val) {
 			this.thisCaption = !val ? "" : val.toString();
@@ -527,7 +531,6 @@ export default {
 	.power-editor-media-caption-block {
 		position: relative;
 		width: 100%;
-		margin-top: 5px;
 	}
 
 	.power-editor-media-container-caption {
