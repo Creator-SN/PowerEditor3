@@ -325,6 +325,38 @@ const exportMarkdown = async () => {
 }
 </style>
 
+### `bubble-custom-buttons`
+
+自定义选中文本时显示的气泡工具栏按钮。支持以下三个插入位置：
+
+| 插槽名 | 插入位置 |
+| :-- | :-- |
+| `bubble-custom-buttons-front` | 所有内置按钮之前。 |
+| `bubble-custom-buttons-1` | 第一个分隔线之后、格式刷按钮之前。 |
+| `bubble-custom-buttons` | 所有内置按钮之后。 |
+
+三个插槽均提供以下参数：
+
+| 参数 | 说明 |
+| :-- | :-- |
+| `editor` | 当前 Tiptap editor 实例。 |
+| `defaultClass` | 气泡工具栏按钮的默认样式类名：`power-editor-bubble-cmd-btn`。 |
+
+```vue
+<power-editor>
+    <template #bubble-custom-buttons="{ editor, defaultClass }">
+        <fv-button
+            :class="defaultClass"
+            @click="editor.chain().focus().toggleBold().run()"
+        >
+            加粗
+        </fv-button>
+    </template>
+</power-editor>
+```
+
+将示例中的插槽名替换为 `bubble-custom-buttons-front` 或 `bubble-custom-buttons-1` 即可调整按钮位置。
+
 ### `front-content`
 
 在正文内容前插入自定义区域，适合展示摘要、头图、说明条或业务自定义头部。

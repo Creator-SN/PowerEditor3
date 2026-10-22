@@ -139,7 +139,29 @@
 				:language="language"
 				:mobileMode="mobileMode"
 				:showSave="showSave"
-			></bubble-tool-bar>
+			>
+				<template v-slot:bubble-custom-buttons-front="x">
+					<slot
+						name="bubble-custom-buttons-front"
+						:editor="editor"
+						:defaultClass="x.defaultClass"
+					></slot>
+				</template>
+				<template v-slot:bubble-custom-buttons-1="x">
+					<slot
+						name="bubble-custom-buttons-1"
+						:editor="editor"
+						:defaultClass="x.defaultClass"
+					></slot>
+				</template>
+				<template v-slot:bubble-custom-buttons="x">
+					<slot
+						name="bubble-custom-buttons"
+						:editor="editor"
+						:defaultClass="x.defaultClass"
+					></slot>
+				</template>
+			</bubble-tool-bar>
 		</tiptap-bubble-menu>
 		<drag-handler
 			v-if="editor && showDragHandler"

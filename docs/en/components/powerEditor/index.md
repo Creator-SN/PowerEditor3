@@ -323,6 +323,38 @@ Slot props:
 }
 </style>
 
+### `bubble-custom-buttons`
+
+Adds custom buttons to the bubble toolbar shown when text is selected. Three insertion positions are available:
+
+| Slot | Position |
+| :-- | :-- |
+| `bubble-custom-buttons-front` | Before all built-in buttons. |
+| `bubble-custom-buttons-1` | After the first separator, before the Format Painter button. |
+| `bubble-custom-buttons` | After all built-in buttons. |
+
+All three slots expose these props:
+
+| Prop | Description |
+| :-- | :-- |
+| `editor` | Current Tiptap editor instance. |
+| `defaultClass` | Default bubble toolbar button class: `power-editor-bubble-cmd-btn`. |
+
+```vue
+<power-editor>
+    <template #bubble-custom-buttons="{ editor, defaultClass }">
+        <fv-button
+            :class="defaultClass"
+            @click="editor.chain().focus().toggleBold().run()"
+        >
+            Bold
+        </fv-button>
+    </template>
+</power-editor>
+```
+
+Replace the slot name in the example with `bubble-custom-buttons-front` or `bubble-custom-buttons-1` to change the button position.
+
 ### `front-content`
 
 Adds custom content before the document body.

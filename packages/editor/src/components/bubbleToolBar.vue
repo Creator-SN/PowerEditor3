@@ -3,6 +3,10 @@
         class="power-editor-bubble-tool-bar-container"
         :class="[{ dark: thisTheme === 'dark' }]"
     >
+        <slot
+            name="bubble-custom-buttons-front"
+            defaultClass="power-editor-bubble-cmd-btn"
+        ></slot>
         <fv-button
             class="power-editor-bubble-cmd-btn"
             :theme="thisTheme"
@@ -48,6 +52,10 @@
             <i class="ms-Icon ms-Icon--Underline"></i>
         </fv-button>
         <hr />
+        <slot
+            name="bubble-custom-buttons-1"
+            defaultClass="power-editor-bubble-cmd-btn"
+        ></slot>
         <fv-button
             class="power-editor-bubble-cmd-btn"
             :theme="thisTheme"
@@ -152,6 +160,10 @@
         >
             <i class="ms-Icon ms-Icon--Code"></i>
         </fv-button>
+        <slot
+            name="bubble-custom-buttons"
+            defaultClass="power-editor-bubble-cmd-btn"
+        ></slot>
     </div>
 </template>
 
