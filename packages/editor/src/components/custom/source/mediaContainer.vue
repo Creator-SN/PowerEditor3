@@ -66,7 +66,8 @@
 				v-for="(button, index) in mediaContainerButtons.left"
 				:key="`left-${index}`"
 				class="power-editor-media-cmd-btn"
-				:background="button.background || defaultButtonBackground"
+				:background="button.background || 'transparent'"
+				borderColor="transparent"
 				:border-radius="6"
 				:theme="theme"
 				fontSize="10"
@@ -78,11 +79,8 @@
 			<fv-button
 				v-show="editor.isEditable"
 				class="power-editor-media-cmd-btn"
-				:background="
-					theme === 'dark'
-						? 'rgba(0, 0, 0, 0.8)'
-						: 'rgba(255, 255, 255, 0.0)'
-				"
+				:background="'transparent'"
+				borderColor="transparent"
 				:border-radius="6"
 				:theme="theme"
 				fontSize="10"
@@ -93,11 +91,8 @@
 			</fv-button>
 			<fv-button
 				class="power-editor-media-cmd-btn"
-				:background="
-					theme === 'dark'
-						? 'rgba(0, 0, 0, 0.8)'
-						: 'rgba(255, 255, 255, 0.0)'
-				"
+				:background="'transparent'"
+				borderColor="transparent"
 				:border-radius="6"
 				:theme="theme"
 				fontSize="10"
@@ -108,11 +103,8 @@
 			</fv-button>
 			<fv-button
 				class="power-editor-media-cmd-btn"
-				:background="
-					theme === 'dark'
-						? 'rgba(0, 0, 0, 0.8)'
-						: 'rgba(255, 255, 255, 0.0)'
-				"
+				:background="'transparent'"
+				borderColor="transparent"
 				:border-radius="6"
 				:theme="theme"
 				fontSize="10"
@@ -126,7 +118,8 @@
 				v-for="(button, index) in mediaContainerButtons.right"
 				:key="`right-${index}`"
 				class="power-editor-media-cmd-btn"
-				:background="button.background || defaultButtonBackground"
+				:background="button.background || 'transparent'"
+				borderColor="transparent"
 				:border-radius="6"
 				:theme="theme"
 				fontSize="10"
@@ -174,11 +167,12 @@
 			:placeholder="getTitle('Write a caption...')"
 			ref="caption"
 			background="transparent"
+			:font-size="12"
 			underline
 			:border-width="2"
-			:is-box-shadow="true"
 			:border-color="'rgba(200, 200, 200, 0.1)'"
 			:focus-border-color="foreground"
+			style="height: 35px"
 			@keyup.enter="
 				() => {
 					show.captionBox = false;
@@ -420,6 +414,11 @@ export default {
 		.power-editor-media-container-caption {
 			color: rgba(230, 230, 230, 1);
 		}
+
+		.power-editor-media-control-btn-block {
+			background: rgba(0, 0, 0, 0.6);
+			border: rgba(36, 36, 36, 0.1) solid thin;
+		}
 	}
 
 	&:hover {
@@ -453,9 +452,7 @@ export default {
 		position: absolute;
 		left: 0px;
 		top: 0px;
-		min-width: 3px;
-		width: 1.2%;
-		max-width: 8px;
+		width: 6px;
 		height: 100%;
 		display: flex;
 		align-items: center;
@@ -471,8 +468,7 @@ export default {
 
 		i {
 			width: 90%;
-			min-height: 10px;
-			height: 30%;
+			height: min(50px, 100%);
 			flex-shrink: 0;
 			background: rgba(12, 12, 12, 0.6);
 			border-radius: 8px;
@@ -488,21 +484,29 @@ export default {
 		top: 0px;
 		width: auto;
 		height: auto;
+		gap: 1px;
+		padding: 2px;
+		background: rgba(255, 255, 255, 0.6);
+		border: rgba(120, 120, 120, 0.1) solid thin;
+		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		opacity: 0;
 		transition: opacity 1s;
+		box-shadow: 0px 0px 1px rgba(120, 120, 120, 0.1);
 
 		&.bottom {
 			top: inherit;
 			bottom: 2px;
+			background: none;
+			border: none;
+			box-shadow: none;
 			z-index: 1;
 		}
 
 		.power-editor-media-cmd-btn {
 			width: 25px;
 			height: 25px;
-			margin-left: 3px;
 			flex-shrink: 0;
 		}
 	}
@@ -529,16 +533,16 @@ export default {
 	.power-editor-media-container-caption {
 		position: relative;
 		min-height: 35px;
-		height: auto;
+		height: 35px;
 		margin: 0px;
-		font-size: 13.8px;
+		font-size: 12px;
 		color: rgba(95, 95, 95, 1);
 		border-radius: 3px;
-		font-family: "Times New Roman", Times, serif;
-		text-align: center;
+		text-align: left;
 		display: flex;
-		justify-content: center;
+		justify-content: flex-start;
 		align-items: center;
+		opacity: 0.8;
 
 		&:hover {
 			background: rgba(200, 200, 200, 0.1);
