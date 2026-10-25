@@ -66,7 +66,7 @@
 						editor.storage.defaultStorage.codeBlockLineNumbers,
 				},
 			]"
-		><code><node-view-content /></code></pre>
+		><node-view-content as="code" /></pre>
 		<div
 			v-if="editor.storage.defaultStorage.codeBlockLineNumbers"
 			contenteditable="false"
@@ -275,7 +275,7 @@ export default {
 		top: 0px;
 		width: 40px;
 		height: 100%;
-		padding-top: 52px;
+		padding-top: calc(30px + 0.75rem);
 		padding-right: 5px;
 		color: rgba(110, 118, 123, 1);
 		box-sizing: border-box;
@@ -302,6 +302,13 @@ export default {
 		margin: 0px;
 		padding: 0.75rem 1rem;
 		color: rgba(36, 36, 36, 1);
+		font-size: 0.8rem;
+		line-height: 1.4;
+
+		> code {
+			display: block;
+			margin: 0;
+		}
 
 		&.lineNumber {
 			padding-left: 40px;
